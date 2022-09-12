@@ -88,18 +88,18 @@ public class Gui extends JFrame implements ActionListener
             catch (InterruptedException | IOException | IM4JavaException except){
                 except.printStackTrace();
             }
-
-
         }
+
         else if(e.getSource() == buttonEdgeDetector){
 
         }
+
         else if(e.getSource() == buttonInvert){
 
         }
+
         else if(e.getSource() == buttonBrightnessContrast){
 
         }
-
     }
 }
