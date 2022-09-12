@@ -10,6 +10,9 @@ import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.JTextField;
 
+import org.im4java.core.ConvertCmd;
+import org.im4java.core.IMOperation;
+
 public class Gui extends JFrame implements ActionListener
 {
     private JPanel panelBottom;
@@ -80,4 +83,13 @@ public class Gui extends JFrame implements ActionListener
         }
 
     }
+    // create command
+    ConvertCmd cmd = new ConvertCmd();
+    // create the operation, add images and operators/options
+    IMOperation op = new IMOperation();
+    op.addImage("myimage.jpg");
+    op.resize(800,600);
+    op.addImage("myimage_small.jpg");
+    // execute the operation
+    cmd.run(op);
 }
