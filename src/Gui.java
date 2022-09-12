@@ -81,7 +81,7 @@ public class Gui extends JFrame implements ActionListener
                 IMOperation op = new IMOperation();
                 op.addImage(textFieldImagePath.getText());
                 op.resize(200, 300);
-                op.addImage(textFieldImagePath.getText() + "_resize");
+                op.addImage(textFieldImagePath.getText().replace(".jpg", "_resize.jpg"));
                 // execute the operation
                 cmd.run(op);
             }
