@@ -12,11 +12,14 @@ import javax.swing.JTextField;
 
 import org.im4java.core.ConvertCmd;
 import org.im4java.core.IMOperation;
+import java.io.IOException;
+import org.im4java.core.IM4JavaException;
+
 
 public class Gui extends JFrame implements ActionListener
 {
     private JPanel panelBottom;
-    private JButton buttonGray, buttonEdgeDetector, buttonInvert, buttonBrightnessContrast, buttonReset;
+    private JButton buttonResize, buttonEdgeDetector, buttonInvert, buttonBrightnessContrast, buttonReset;
     private JTextField textFieldImagePath;
 
 
@@ -25,8 +28,8 @@ public class Gui extends JFrame implements ActionListener
         super("UMGC Western Blot Editor");
 
         // Create Graphical Interface
-        buttonGray = new JButton("Gray");
-        buttonGray.addActionListener(this);
+        buttonResize = new JButton("Resize");
+        buttonResize.addActionListener(this);
         buttonEdgeDetector = new JButton("EdgeDetector");
         buttonEdgeDetector.addActionListener(this);
         buttonInvert = new JButton("Invert");
@@ -37,7 +40,7 @@ public class Gui extends JFrame implements ActionListener
         buttonReset.addActionListener(this);
 
         panelBottom = new JPanel();
-        panelBottom.add(buttonGray);
+        panelBottom.add(buttonResize);
         panelBottom.add(buttonEdgeDetector);
         panelBottom.add(buttonInvert);
         panelBottom.add(buttonBrightnessContrast);
@@ -66,10 +69,26 @@ public class Gui extends JFrame implements ActionListener
     public static void main(String args[]){
         Gui t = new Gui();
         t.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
     }
 
     public void actionPerformed(ActionEvent e){
-        if(e.getSource() == buttonGray){
+        if(e.getSource() == buttonResize){
+            try {
+                // create command
+                ConvertCmd cmd = new ConvertCmd();
+                // create the operation, add images and operators/options
+                IMOperation op = new IMOperation();
+                op.addImage(textFieldImagePath.getText());
+                op.resize(200, 300);
+                op.addImage(textFieldImagePath.getText() + "_resize");
+                // execute the operation
+                cmd.run(op);
+            }
+            catch (InterruptedException | IOException | IM4JavaException except){
+                except.printStackTrace();
+            }
+
 
         }
         else if(e.getSource() == buttonEdgeDetector){
@@ -83,13 +102,4 @@ public class Gui extends JFrame implements ActionListener
         }
 
     }
-    // create command
-    ConvertCmd cmd = new ConvertCmd();
-    // create the operation, add images and operators/options
-    IMOperation op = new IMOperation();
-    op.addImage("myimage.jpg");
-    op.resize(800,600);
-    op.addImage("myimage_small.jpg");
-    // execute the operation
-    cmd.run(op);
 }
