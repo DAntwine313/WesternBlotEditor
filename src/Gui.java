@@ -32,7 +32,7 @@ public class Gui extends JFrame implements ActionListener
     private JTextField textFieldImagePath;
 
     private JMenu file, edit, tools;
-    private JMenuItem file1, file2, file3, edit1, toolsCrop, toolsBC, toolsResize;
+    private JMenuItem fileOpen, fileSave, fileSaveAs, editReset, toolsCrop, toolsBC, toolsResize;
     private JMenuBar mb;
 
 
@@ -53,14 +53,14 @@ public class Gui extends JFrame implements ActionListener
         buttonReset = new JButton("Reset");
         buttonReset.addActionListener(this);
             // Create menu items
-        file1 = new JMenuItem("Open");
-        file1.addActionListener(this);
-        file2 = new JMenuItem("Save");
-        file2.addActionListener(this);
-        file3 = new JMenuItem("Save As");
-        file3.addActionListener(this);
-        edit1 = new JMenuItem("Reset");
-        edit1.addActionListener(this);
+        fileOpen = new JMenuItem("Open");
+        fileOpen.addActionListener(this);
+        fileSave = new JMenuItem("Save");
+        fileSave.addActionListener(this);
+        fileSaveAs = new JMenuItem("Save As");
+        fileSaveAs.addActionListener(this);
+        editReset = new JMenuItem("Reset");
+        editReset.addActionListener(this);
         toolsCrop = new JMenuItem("Crop");
         toolsCrop.addActionListener(this);
         toolsBC = new JMenuItem("Brightness/Contrast");
@@ -71,10 +71,10 @@ public class Gui extends JFrame implements ActionListener
         file = new JMenu("File");
         edit = new JMenu("Edit");
         tools = new JMenu("Tools");
-        file.add(file1);
-        file.add(file2);
-        file.add(file3);
-        edit.add(edit1);
+        file.add(fileOpen);
+        file.add(fileSave);
+        file.add(fileSaveAs);
+        edit.add(editReset);
         tools.add(toolsCrop);
         tools.add(toolsBC);
         tools.add(toolsResize);
@@ -127,10 +127,20 @@ public class Gui extends JFrame implements ActionListener
     }
 
     public void actionPerformed(ActionEvent e){
-        if(e.getSource() == file1){
+        if(e.getSource() == fileOpen){
 
-        };
-        if(e.getSource() == buttonCrop | e.getSource() == toolsCrop){
+        }
+        else if(e.getSource() == fileSave){
+
+        }
+        else if(e.getSource() == fileSaveAs){
+        
+        }
+        else if(e.getSource() == editReset){
+  
+        }
+
+        else if(e.getSource() == buttonCrop | e.getSource() == toolsCrop){
 
         }
         else if(e.getSource() == buttonBrightnessContrast | e.getSource() == toolsBC){
