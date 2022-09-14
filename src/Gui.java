@@ -26,7 +26,7 @@ import org.im4java.core.IM4JavaException;
 
 public class Gui extends JFrame implements ActionListener
 {
-    private JPanel panelBottom;
+    private JPanel panelBottom, menuBar;
     private JLabel imgLabel;
     private JButton buttonResize, buttonEdgeDetector, buttonInvert, buttonBrightnessContrast, buttonReset;
     private JTextField textFieldImagePath;
@@ -77,6 +77,37 @@ public class Gui extends JFrame implements ActionListener
         JLabel imgLabel = new JLabel(new ImageIcon(path));
 
         l_c.add(imgLabel, BorderLayout.CENTER);
+
+        // Menu
+        menuBar = new JPanel();
+        // create a menubar
+        JMenuBar mb = new JMenuBar();
+        // create a menu
+        JMenu file = new JMenu("File");
+        JMenu edit = new JMenu("Edit");
+        JMenu tools = new JMenu("Tools");
+        // create menuitems
+        JMenuItem file1 = new JMenuItem("Open");
+        JMenuItem file2 = new JMenuItem("Save");
+        JMenuItem file3 = new JMenuItem("Save As");
+        JMenuItem edit1 = new JMenuItem("Reset");
+        JMenuItem tools1 = new JMenuItem("Brightness/Contrast");
+        JMenuItem tools2 = new JMenuItem("Resize");
+        // add menu items to menu
+        file.add(file1);
+        file.add(file2);
+        file.add(file3);
+        edit.add(edit1);
+        tools.add(tools1);
+        tools.add(tools2);
+        // add menu to menu bar
+        mb.add(file);
+        mb.add(edit);
+        mb.add(tools);
+        // add menubar to panel
+        menuBar.setLayout(new BorderLayout());
+        menuBar.add(mb);
+        l_c.add(menuBar, BorderLayout.NORTH);
         setVisible(true);
         pack();
     }
