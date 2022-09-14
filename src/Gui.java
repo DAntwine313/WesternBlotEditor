@@ -2,25 +2,35 @@ import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.*;
 
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JFileChooser;
+// for use with mouse clicks
+import java.awt.Graphics;
+import java.awt.MouseInfo;
+import java.awt.Point;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+
+import java.io.*;
+import java.io.IOException;
+
+import javax.imageio.*;
+import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.JTextField;
 
 import org.im4java.core.ConvertCmd;
+import org.im4java.core.DisplayCmd;
 import org.im4java.core.IMOperation;
-import java.io.IOException;
 import org.im4java.core.IM4JavaException;
 
 
 public class Gui extends JFrame implements ActionListener
 {
     private JPanel panelBottom;
+    private JLabel imgLabel;
     private JButton buttonResize, buttonEdgeDetector, buttonInvert, buttonBrightnessContrast, buttonReset;
     private JTextField textFieldImagePath;
+
 
 
     public Gui()
@@ -53,6 +63,7 @@ public class Gui extends JFrame implements ActionListener
         l_c.add(panelBottom, BorderLayout.SOUTH);
 
         // Load image
+
         JFileChooser chooser = new JFileChooser();
         FileNameExtensionFilter filter = new FileNameExtensionFilter(
                 "JPG & GIF Images", "jpg", "gif");
@@ -62,8 +73,12 @@ public class Gui extends JFrame implements ActionListener
         if(returnVal == JFileChooser.APPROVE_OPTION) {
             textFieldImagePath.setText(chooser.getSelectedFile().getAbsolutePath());
         }
-        setSize(340,430);
+        String path = textFieldImagePath.getText();
+        JLabel imgLabel = new JLabel(new ImageIcon(path));
+
+        l_c.add(imgLabel, BorderLayout.CENTER);
         setVisible(true);
+        pack();
     }
 
     public static void main(String args[]){
