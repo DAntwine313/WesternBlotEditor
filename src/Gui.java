@@ -28,11 +28,11 @@ public class Gui extends JFrame implements ActionListener
 {
     private JPanel panelBottom, menuBar;
     private JLabel imgLabel;
-    private JButton buttonResize, buttonEdgeDetector, buttonInvert, buttonBrightnessContrast, buttonReset;
+    private JButton buttonResize, buttonCrop, buttonInvert, buttonBrightnessContrast, buttonReset;
     private JTextField textFieldImagePath;
 
     private JMenu file, edit, tools;
-    private JMenuItem file1, file2, file3, edit1, tools1, tools2;
+    private JMenuItem file1, file2, file3, edit1, toolsCrop, toolsBC, toolsResize;
     private JMenuBar mb;
 
 
@@ -44,8 +44,8 @@ public class Gui extends JFrame implements ActionListener
           // Buttons and Listeners
         buttonResize = new JButton("Resize");
         buttonResize.addActionListener(this);
-        buttonEdgeDetector = new JButton("EdgeDetector");
-        buttonEdgeDetector.addActionListener(this);
+        buttonCrop = new JButton("Crop");
+        buttonCrop.addActionListener(this);
         buttonInvert = new JButton("Invert");
         buttonInvert.addActionListener(this);
         buttonBrightnessContrast = new JButton("Bright/Contrast");
@@ -61,10 +61,12 @@ public class Gui extends JFrame implements ActionListener
         file3.addActionListener(this);
         edit1 = new JMenuItem("Reset");
         edit1.addActionListener(this);
-        tools1 = new JMenuItem("Brightness/Contrast");
-        tools1.addActionListener(this);
-        tools2 = new JMenuItem("Resize");
-        tools2.addActionListener(this);
+        toolsCrop = new JMenuItem("Crop");
+        toolsCrop.addActionListener(this);
+        toolsBC = new JMenuItem("Brightness/Contrast");
+        toolsBC.addActionListener(this);
+        toolsResize = new JMenuItem("Resize");
+        toolsResize.addActionListener(this);
             // Create Menu and Add Menu Items
         file = new JMenu("File");
         edit = new JMenu("Edit");
@@ -73,8 +75,9 @@ public class Gui extends JFrame implements ActionListener
         file.add(file2);
         file.add(file3);
         edit.add(edit1);
-        tools.add(tools1);
-        tools.add(tools2);
+        tools.add(toolsCrop);
+        tools.add(toolsBC);
+        tools.add(toolsResize);
             // Create Menu Bar
         mb = new JMenuBar();
         mb.add(file);
@@ -87,23 +90,25 @@ public class Gui extends JFrame implements ActionListener
             // Add Buttons
         panelBottom = new JPanel();
         panelBottom.add(buttonResize);
-        panelBottom.add(buttonEdgeDetector);
+        panelBottom.add(buttonCrop);
         panelBottom.add(buttonInvert);
         panelBottom.add(buttonBrightnessContrast);
         panelBottom.add(buttonReset);
-
-        // Load image
         JFileChooser chooser = new JFileChooser();
         FileNameExtensionFilter filter = new FileNameExtensionFilter(
                 "JPG & GIF Images", "jpg", "gif");
         chooser.setFileFilter(filter);
         textFieldImagePath = new JTextField(100);
         int returnVal = chooser.showOpenDialog(null);
-        if(returnVal == JFileChooser.APPROVE_OPTION) {
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
             textFieldImagePath.setText(chooser.getSelectedFile().getAbsolutePath());
         }
         String path = textFieldImagePath.getText();
-        JLabel imgLabel = new JLabel(new ImageIcon(path));
+        ImageIcon image = new ImageIcon(path);
+        JLabel imgLabel = new JLabel();
+        imgLabel.setIcon(image);
+        imgLabel.getIcon();
+
 
         // Add to GUI
         Container l_c = getContentPane();
@@ -123,19 +128,15 @@ public class Gui extends JFrame implements ActionListener
 
     public void actionPerformed(ActionEvent e){
         if(e.getSource() == file1){
-            JFileChooser chooser = new JFileChooser();
-            FileNameExtensionFilter filter = new FileNameExtensionFilter(
-                    "JPG & GIF Images", "jpg", "gif");
-            chooser.setFileFilter(filter);
-            textFieldImagePath = new JTextField(100);
-            int returnVal = chooser.showOpenDialog(null);
-            if(returnVal == JFileChooser.APPROVE_OPTION) {
-                textFieldImagePath.setText(chooser.getSelectedFile().getAbsolutePath());
-            }
-            String path = textFieldImagePath.getText();
-            JLabel imgLabel = new JLabel(new ImageIcon(path));
+
         };
-        if(e.getSource() == buttonResize | e.getSource() == tools2) {
+        if(e.getSource() == buttonCrop | e.getSource() == toolsCrop){
+
+        }
+        else if(e.getSource() == buttonBrightnessContrast | e.getSource() == toolsBC){
+
+        }
+        else if (e.getSource() == buttonResize | e.getSource() == toolsResize) {
             try {
                 // create command
                 ConvertCmd cmd = new ConvertCmd();
@@ -152,15 +153,7 @@ public class Gui extends JFrame implements ActionListener
             }
         }
 
-        else if(e.getSource() == buttonEdgeDetector){
-
-        }
-
         else if(e.getSource() == buttonInvert){
-
-        }
-
-        else if(e.getSource() == buttonBrightnessContrast){
 
         }
     }
