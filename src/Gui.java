@@ -2,39 +2,30 @@ import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.*;
 
 // for use with mouse clicks
-import java.awt.Graphics;
-import java.awt.MouseInfo;
-import java.awt.Point;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 
 import java.io.*;
 import java.io.IOException;
 
-import javax.imageio.*;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import org.im4java.core.ConvertCmd;
-import org.im4java.core.DisplayCmd;
-import org.im4java.core.IMOperation;
-import org.im4java.core.IM4JavaException;
+import org.im4java.core.*;
 
 
-public class Gui extends JFrame implements ActionListener
-{
+public class Gui extends JFrame implements ActionListener {
     private JPanel panelBottom, menuBar;
     private JLabel imgLabel;
-    private JButton buttonResize, buttonEdgeDetector, buttonInvert, buttonBrightnessContrast, buttonReset;
+    private JButton buttonResize;
+    private JButton buttonEdgeDetector;
+    private JButton buttonInvert;
+    private JButton buttonBrightnessContrast;
+    private JButton buttonReset;
     private JTextField textFieldImagePath;
 
 
-
-    public Gui()
-    {
+    public Gui() {
         super("UMGC Western Blot Editor");
 
         // Create Graphical Interface
@@ -70,7 +61,7 @@ public class Gui extends JFrame implements ActionListener
         chooser.setFileFilter(filter);
         textFieldImagePath = new JTextField(100);
         int returnVal = chooser.showOpenDialog(null);
-        if(returnVal == JFileChooser.APPROVE_OPTION) {
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
             textFieldImagePath.setText(chooser.getSelectedFile().getAbsolutePath());
         }
         String path = textFieldImagePath.getText();
@@ -112,40 +103,72 @@ public class Gui extends JFrame implements ActionListener
         pack();
     }
 
-    public static void main(String args[]){
+    public static void main(String args[]) throws FileNotFoundException {
         Gui t = new Gui();
         t.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
     }
 
-    public void actionPerformed(ActionEvent e){
-        if(e.getSource() == buttonResize){
+    public void actionPerformed(ActionEvent e) {
+
+        FileWriter writer = null;
+        {
             try {
-                // create command
-                ConvertCmd cmd = new ConvertCmd();
-                // create the operation, add images and operators/options
-                IMOperation op = new IMOperation();
-                op.addImage(textFieldImagePath.getText());
-                op.resize(200, 300);
-                op.addImage(textFieldImagePath.getText().replace(".jpg", "_resize.jpg"));
-                // execute the operation
-                cmd.run(op);
+                writer = new FileWriter("bash_output.sh");
+            } catch (IOException ex) {
+                ex.printStackTrace();
             }
-            catch (InterruptedException | IOException | IM4JavaException except){
-                except.printStackTrace();
+
+            if (e.getSource() == buttonResize) {
+                try {
+                    // create command
+                    ConvertCmd cmd = new ConvertCmd();
+                    // create the operation, add images and operators/options
+                    IMOperation op = new IMOperation();
+                    op.addImage(textFieldImagePath.getText());
+                    op.resize(200, 300);
+                    op.addImage(textFieldImagePath.getText().replace(".jpg", "_resize.jpg"));
+                    // execute the operation
+                    cmd.run(op);
+
+                } catch (InterruptedException | IOException | IM4JavaException except) {
+                    except.printStackTrace();
+                }
+                try {
+                    writer.write("\nThe RESIZE line");
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+                try {
+                    writer.close();
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+
+            } else if (e.getSource() == buttonEdgeDetector) {
+
+            } else if (e.getSource() == buttonInvert) {
+
+            } else if (e.getSource() == buttonBrightnessContrast) {
+                }
+            }
+/*
+    public static void BashScriptGenerator()  {
+
+        // create new empty shell script file
+        // write commands to shell script
+        PrintWriter writer = null;
+
+        {
+            try {
+                writer = new PrintWriter("/Users/pfspooter/Desktop/bash_output.sh");
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+                writer.println("The first line");
+                writer.close();
             }
         }
 
-        else if(e.getSource() == buttonEdgeDetector){
-
-        }
-
-        else if(e.getSource() == buttonInvert){
-
-        }
-
-        else if(e.getSource() == buttonBrightnessContrast){
-
+ */
         }
     }
-}
