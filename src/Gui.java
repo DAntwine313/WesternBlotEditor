@@ -2,24 +2,19 @@ import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.*;
 
-// for use with mouse clicks
-import java.awt.Graphics;
-import java.awt.MouseInfo;
-import java.awt.Point;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-
-import java.io.*;
 import java.io.IOException;
+import java.io.File;
 
-import javax.imageio.*;
+import javax.imageio.ImageIO;
+
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.im4java.core.ConvertCmd;
-import org.im4java.core.DisplayCmd;
 import org.im4java.core.IMOperation;
 import org.im4java.core.IM4JavaException;
 
@@ -36,8 +31,7 @@ public class Gui extends JFrame implements ActionListener
     private JMenuBar mb;
 
 
-    public Gui()
-    {
+    public Gui() throws IOException {
         super("UMGC Western Blot Editor");
 
         // Create Graphical Interface
@@ -94,50 +88,41 @@ public class Gui extends JFrame implements ActionListener
         panelBottom.add(buttonInvert);
         panelBottom.add(buttonBrightnessContrast);
         panelBottom.add(buttonReset);
-        JFileChooser chooser = new JFileChooser();
-        FileNameExtensionFilter filter = new FileNameExtensionFilter(
-                "JPG & GIF Images", "jpg", "gif");
-        chooser.setFileFilter(filter);
-        textFieldImagePath = new JTextField(100);
-        int returnVal = chooser.showOpenDialog(null);
-        if (returnVal == JFileChooser.APPROVE_OPTION) {
-            textFieldImagePath.setText(chooser.getSelectedFile().getAbsolutePath());
-        }
-        String path = textFieldImagePath.getText();
-        ImageIcon image = new ImageIcon(path);
-        JLabel imgLabel = new JLabel();
-        imgLabel.setIcon(image);
-        imgLabel.getIcon();
 
+        JScrollPane imageScrollPane = new DisplayImage().getDisplayImage();
 
         // Add to GUI
         Container l_c = getContentPane();
         l_c.setLayout(new BorderLayout());
         l_c.add(menuBar, BorderLayout.NORTH);
-        l_c.add(panelBottom, BorderLayout.EAST);
-        l_c.add(imgLabel, BorderLayout.CENTER);
+        l_c.add(panelBottom, BorderLayout.WEST);
+        l_c.add(imageScrollPane, BorderLayout.CENTER);
         setVisible(true);
         pack();
     }
 
-    public static void main(String args[]){
+    public static void main(String args[]) throws IOException {
         Gui t = new Gui();
         t.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
     }
 
     public void actionPerformed(ActionEvent e){
         if(e.getSource() == fileOpen){
-
+            DisplayImage t = new DisplayImage();
+            JScrollPane imageScrollPane = new JScrollPane();
+            try {
+                imageScrollPane = new DisplayImage().getDisplayImage();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
         }
         else if(e.getSource() == fileSave){
-
         }
         else if(e.getSource() == fileSaveAs){
-        
+
         }
         else if(e.getSource() == editReset){
-  
+
         }
 
         else if(e.getSource() == buttonCrop | e.getSource() == toolsCrop){
@@ -152,7 +137,7 @@ public class Gui extends JFrame implements ActionListener
                 ConvertCmd cmd = new ConvertCmd();
                 // create the operation, add images and operators/options
                 IMOperation op = new IMOperation();
-                op.addImage(textFieldImagePath.getText());
+                op.addImage();
                 op.resize(200, 300);
                 op.addImage(textFieldImagePath.getText().replace(".jpg", "_resize.jpg"));
                 // execute the operation
@@ -167,4 +152,4 @@ public class Gui extends JFrame implements ActionListener
 
         }
     }
-}
+        }
