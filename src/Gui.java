@@ -29,6 +29,8 @@ public class Gui extends JFrame implements ActionListener
     private JMenu file, edit, tools;
     private JMenuItem fileOpen, fileSave, fileSaveAs, editReset, toolsCrop, toolsBC, toolsResize;
     private JMenuBar mb;
+    private JScrollPane imageScrollPane;
+    private Container l_c;
 
 
     public Gui() throws IOException {
@@ -89,10 +91,10 @@ public class Gui extends JFrame implements ActionListener
         panelBottom.add(buttonBrightnessContrast);
         panelBottom.add(buttonReset);
 
-        JScrollPane imageScrollPane = new DisplayImage().getDisplayImage();
+        imageScrollPane = new DisplayImage().getDisplayImage();
 
         // Add to GUI
-        Container l_c = getContentPane();
+        l_c = getContentPane();
         l_c.setLayout(new BorderLayout());
         l_c.add(menuBar, BorderLayout.NORTH);
         l_c.add(panelBottom, BorderLayout.WEST);
@@ -109,9 +111,11 @@ public class Gui extends JFrame implements ActionListener
     public void actionPerformed(ActionEvent e){
         if(e.getSource() == fileOpen){
             DisplayImage t = new DisplayImage();
-            JScrollPane imageScrollPane = new JScrollPane();
             try {
+                l_c.remove(imageScrollPane);
                 imageScrollPane = new DisplayImage().getDisplayImage();
+                l_c.add(imageScrollPane);
+                l_c.validate();
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
