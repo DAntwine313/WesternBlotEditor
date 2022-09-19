@@ -24,13 +24,14 @@ public class Gui extends JFrame implements ActionListener
     private JPanel panelBottom, menuBar;
     private JLabel imgLabel;
     private JButton buttonResize, buttonCrop, buttonInvert, buttonBrightnessContrast, buttonReset;
-    private JTextField textFieldImagePath;
 
     private JMenu file, edit, tools;
     private JMenuItem fileOpen, fileSave, fileSaveAs, editReset, toolsCrop, toolsBC, toolsResize;
     private JMenuBar mb;
     private JScrollPane imageScrollPane;
     private Container l_c;
+    private DisplayImage g = null;
+    private String imagePath = null;
 
 
     public Gui() throws IOException {
@@ -91,14 +92,11 @@ public class Gui extends JFrame implements ActionListener
         panelBottom.add(buttonBrightnessContrast);
         panelBottom.add(buttonReset);
 
-        imageScrollPane = new DisplayImage().getDisplayImage();
-
         // Add to GUI
         l_c = getContentPane();
         l_c.setLayout(new BorderLayout());
         l_c.add(menuBar, BorderLayout.NORTH);
         l_c.add(panelBottom, BorderLayout.WEST);
-        l_c.add(imageScrollPane, BorderLayout.CENTER);
         setVisible(true);
         pack();
     }
@@ -110,12 +108,14 @@ public class Gui extends JFrame implements ActionListener
 
     public void actionPerformed(ActionEvent e){
         if(e.getSource() == fileOpen){
-            DisplayImage t = new DisplayImage();
+            g = new DisplayImage();
             try {
-                l_c.remove(imageScrollPane);
+                if(imageScrollPane != null)
+                    l_c.remove(imageScrollPane);
                 imageScrollPane = new DisplayImage().getDisplayImage();
                 l_c.add(imageScrollPane);
-                l_c.validate();
+                l_c.revalidate();
+                imagePath = g.imagePath;
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
@@ -143,7 +143,7 @@ public class Gui extends JFrame implements ActionListener
                 IMOperation op = new IMOperation();
                 op.addImage();
                 op.resize(200, 300);
-                op.addImage(textFieldImagePath.getText().replace(".jpg", "_resize.jpg"));
+                op.addImage(imagePath.replace(".jpg", "_resize.jpg"));
                 // execute the operation
                 cmd.run(op);
             }

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>WesternBlotEditor</name>
+	<comment></comment>
+	<projects>
+	</projects>
+	<buildSpec>
+	</buildSpec>
+	<natures>
+	</natures>
+	<variableList>
+		<variable>
+			<name>JAVA_LIB</name>
+			<value>file:/Library/Java/JavaVirtualMachines/jdk-18.0.2.jdk</value>
+		</variable>
+	</variableList>
+</projectDescription>

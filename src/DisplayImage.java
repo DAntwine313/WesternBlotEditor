@@ -6,6 +6,8 @@ import java.io.IOException;
 
 public class DisplayImage {
 
+    JTextField textFieldImagePath;
+    String imagePath;
     public static void main(String[] args) throws IOException {
         DisplayImage gui = new DisplayImage();
     }
@@ -15,10 +17,11 @@ public class DisplayImage {
         FileNameExtensionFilter filter = new FileNameExtensionFilter(
                 "JPG, GIF, PNG Images", "jpg", "gif", "png");
         chooser.setFileFilter(filter);
-        JTextField textFieldImagePath = new JTextField(100);
+        textFieldImagePath = new JTextField(100);
         int returnVal = chooser.showOpenDialog(null);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             textFieldImagePath.setText(chooser.getSelectedFile().getAbsolutePath());
+            imagePath = textFieldImagePath.getText();
         }
         BufferedImage img = ImageIO.read(chooser.getSelectedFile().getAbsoluteFile());
         ImageIcon icon = new ImageIcon(img);
