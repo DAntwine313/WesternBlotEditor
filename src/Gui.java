@@ -30,8 +30,7 @@ public class Gui extends JFrame implements ActionListener
     private JMenuBar mb;
     private JScrollPane imageScrollPane;
     private Container l_c;
-    private DisplayImage g = null;
-    private String imagePath, newImage;
+    private String imagePath, newImage, originalImage;
 
 
     public Gui() throws IOException {
@@ -103,6 +102,7 @@ public class Gui extends JFrame implements ActionListener
             textFieldImagePath.setText(chooser.getSelectedFile().getAbsolutePath());
         }
         imagePath = textFieldImagePath.getText();
+        originalImage = imagePath;
         File imgFile = new File(textFieldImagePath.getText());
         BufferedImage img = ImageIO.read(imgFile);
         ImageIcon icon = new ImageIcon(img);
@@ -137,7 +137,8 @@ public class Gui extends JFrame implements ActionListener
                 textFieldImagePath.setText(chooser.getSelectedFile().getAbsolutePath());
             }
             imagePath = textFieldImagePath.getText();
-            File imgFile = new File(textFieldImagePath.getText());
+            originalImage = imagePath;
+            File imgFile = new File(imagePath);
             BufferedImage img;
             try {
                 img = ImageIO.read(imgFile);
@@ -152,12 +153,26 @@ public class Gui extends JFrame implements ActionListener
             l_c.revalidate();
         }
         else if(e.getSource() == fileSave){
+
         }
         else if(e.getSource() == fileSaveAs){
 
         }
-        else if(e.getSource() == editReset){
-
+        else if(e.getSource() == buttonReset | e.getSource() == editReset){
+            imagePath = originalImage;
+            File imgFile = new File(imagePath);
+            BufferedImage img;
+            try {
+                img = ImageIO.read(imgFile);
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+            ImageIcon icon = new ImageIcon(img);
+            JLabel image = new JLabel(icon);
+            l_c.remove(imageScrollPane);
+            imageScrollPane = new JScrollPane(image);
+            l_c.add(imageScrollPane);
+            l_c.revalidate();
         }
 
         else if(e.getSource() == buttonCrop | e.getSource() == toolsCrop){
@@ -171,13 +186,13 @@ public class Gui extends JFrame implements ActionListener
                 // resize dialogue
                 JTextField width = new JTextField(5);
                 JTextField height = new JTextField(5);
-                JPanel myPanel = new JPanel();
-                myPanel.setLayout(new GridLayout(2,2));
-                myPanel.add(new JLabel("Width: "));
-                myPanel.add(width);
-                myPanel.add(new JLabel("Height: "));
-                myPanel.add(height);
-                JOptionPane.showConfirmDialog(null, myPanel,
+                JPanel resizePanel = new JPanel();
+                resizePanel.setLayout(new GridLayout(2,2));
+                resizePanel.add(new JLabel("Width: "));
+                resizePanel.add(width);
+                resizePanel.add(new JLabel("Height: "));
+                resizePanel.add(height);
+                JOptionPane.showConfirmDialog(null, resizePanel,
                         "Resize Dimensions", JOptionPane.OK_CANCEL_OPTION);
                 // ImageMagick Call
                 ConvertCmd cmd = new ConvertCmd();
