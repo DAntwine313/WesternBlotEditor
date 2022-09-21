@@ -1,8 +1,8 @@
-import java.awt.BorderLayout;
-import java.awt.Container;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.File;
 
@@ -31,7 +31,7 @@ public class Gui extends JFrame implements ActionListener
     private JScrollPane imageScrollPane;
     private Container l_c;
     private DisplayImage g = null;
-    private String imagePath = null;
+    private String imagePath;
 
 
     public Gui() throws IOException {
@@ -92,11 +92,30 @@ public class Gui extends JFrame implements ActionListener
         panelBottom.add(buttonBrightnessContrast);
         panelBottom.add(buttonReset);
 
+        // Load Initial Image ** FIND A BETTER WAY TO DO THIS!! ***
+        JFileChooser chooser = new JFileChooser();
+        FileNameExtensionFilter filter = new FileNameExtensionFilter(
+                "JPG, GIF, PNG Images", "jpg", "gif", "png");
+        chooser.setFileFilter(filter);
+        JTextField textFieldImagePath = new JTextField(100);
+        int returnVal = chooser.showOpenDialog(null);
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            textFieldImagePath.setText(chooser.getSelectedFile().getAbsolutePath());
+        }
+        imagePath = textFieldImagePath.getText();
+        File imgFile = new File(textFieldImagePath.getText());
+        BufferedImage img = ImageIO.read(imgFile);
+        ImageIcon icon = new ImageIcon(img);
+        JLabel image = new JLabel(icon);
+        imageScrollPane = new JScrollPane(image);
+
+
         // Add to GUI
         l_c = getContentPane();
         l_c.setLayout(new BorderLayout());
         l_c.add(menuBar, BorderLayout.NORTH);
         l_c.add(panelBottom, BorderLayout.WEST);
+        l_c.add(imageScrollPane, BorderLayout.EAST);
         setVisible(true);
         pack();
     }
@@ -108,17 +127,29 @@ public class Gui extends JFrame implements ActionListener
 
     public void actionPerformed(ActionEvent e){
         if(e.getSource() == fileOpen){
-            g = new DisplayImage();
+            JFileChooser chooser = new JFileChooser();
+            FileNameExtensionFilter filter = new FileNameExtensionFilter(
+                    "JPG, GIF, PNG Images", "jpg", "gif", "png");
+            chooser.setFileFilter(filter);
+            JTextField textFieldImagePath = new JTextField(100);
+            int returnVal = chooser.showOpenDialog(null);
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                textFieldImagePath.setText(chooser.getSelectedFile().getAbsolutePath());
+            }
+            imagePath = textFieldImagePath.getText();
+            File imgFile = new File(textFieldImagePath.getText());
+            BufferedImage img;
             try {
-                if(imageScrollPane != null)
-                    l_c.remove(imageScrollPane);
-                imageScrollPane = new DisplayImage().getDisplayImage();
-                l_c.add(imageScrollPane);
-                l_c.revalidate();
-                imagePath = g.imagePath;
+                img = ImageIO.read(imgFile);
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
+            ImageIcon icon = new ImageIcon(img);
+            JLabel image = new JLabel(icon);
+            l_c.remove(imageScrollPane);
+            imageScrollPane = new JScrollPane(image);
+            l_c.add(imageScrollPane);
+            l_c.revalidate();
         }
         else if(e.getSource() == fileSave){
         }
@@ -137,15 +168,41 @@ public class Gui extends JFrame implements ActionListener
         }
         else if (e.getSource() == buttonResize | e.getSource() == toolsResize) {
             try {
-                // create command
+                // resize dialogue
+                JTextField width = new JTextField(5);
+                JTextField height = new JTextField(5);
+                JPanel myPanel = new JPanel();
+                myPanel.setLayout(new GridLayout(2,2));
+                myPanel.add(new JLabel("Width: "));
+                myPanel.add(width);
+                myPanel.add(new JLabel("Height: "));
+                myPanel.add(height);
+                JOptionPane.showConfirmDialog(null, myPanel,
+                        "Resize Dimensions", JOptionPane.OK_CANCEL_OPTION);
+                // ImageMagick Call
                 ConvertCmd cmd = new ConvertCmd();
                 // create the operation, add images and operators/options
                 IMOperation op = new IMOperation();
-                op.addImage();
-                op.resize(200, 300);
-                op.addImage(imagePath.replace(".jpg", "_resize.jpg"));
+                op.addImage(imagePath);
+                op.resize(Integer.parseInt(width.getText()), Integer.parseInt(height.getText()));
+                String newImage = imagePath.replace(".jpg", "_resize"+".jpg");
+                op.addImage(newImage);
                 // execute the operation
                 cmd.run(op);
+                imagePath = newImage;
+                File imgFile = new File(newImage);
+                BufferedImage img;
+                try {
+                    img = ImageIO.read(imgFile);
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+                ImageIcon icon = new ImageIcon(img);
+                JLabel image = new JLabel(icon);
+                l_c.remove(imageScrollPane);
+                imageScrollPane = new JScrollPane(image);
+                l_c.add(imageScrollPane);
+                l_c.revalidate();
             }
             catch (InterruptedException | IOException | IM4JavaException except){
                 except.printStackTrace();
