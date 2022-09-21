@@ -31,7 +31,7 @@ public class Gui extends JFrame implements ActionListener
     private JScrollPane imageScrollPane;
     private Container l_c;
     private DisplayImage g = null;
-    private String imagePath;
+    private String imagePath, newImage;
 
 
     public Gui() throws IOException {
@@ -185,12 +185,12 @@ public class Gui extends JFrame implements ActionListener
                 IMOperation op = new IMOperation();
                 op.addImage(imagePath);
                 op.resize(Integer.parseInt(width.getText()), Integer.parseInt(height.getText()));
-                String newImage = imagePath.replace(".jpg", "_resize"+".jpg");
+                newImage = imagePath.replace(".jpg", "_resize.jpg");
                 op.addImage(newImage);
                 // execute the operation
                 cmd.run(op);
                 imagePath = newImage;
-                File imgFile = new File(newImage);
+                File imgFile = new File(imagePath);
                 BufferedImage img;
                 try {
                     img = ImageIO.read(imgFile);
