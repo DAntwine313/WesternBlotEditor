@@ -1,213 +1,231 @@
 import java.awt.*;
-import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import org.im4java.core.Operation;
-import org.im4java.script.AbstractScriptGenerator;
 
-// for use with mouse clicks
-
-import java.io.*;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.Calendar;
+import java.io.File;
 
+import javax.imageio.ImageIO;
+
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import org.im4java.core.*;
+import org.im4java.core.ConvertCmd;
+import org.im4java.core.IMOperation;
+import org.im4java.core.IM4JavaException;
 
 
-public class Gui extends JFrame implements ActionListener {
+public class Gui extends JFrame implements ActionListener
+{
     private JPanel panelBottom, menuBar;
     private JLabel imgLabel;
-    private JButton buttonResize;
-    private JButton buttonEdgeDetector;
-    private JButton buttonInvert;
-    private JButton buttonBrightnessContrast;
-    private JButton buttonReset;
-    private JTextField textFieldImagePath;
+    private JButton buttonResize, buttonCrop, buttonInvert, buttonBrightnessContrast, buttonReset;
+
+    private JMenu file, edit, tools;
+    private JMenuItem fileOpen, fileSave, fileSaveAs, editReset, toolsCrop, toolsBC, toolsResize;
+    private JMenuBar mb;
+    private JScrollPane imageScrollPane;
+    private Container l_c;
+    private String imagePath, newImage, originalImage;
 
 
-    public Gui() {
+    public Gui() throws IOException {
         super("UMGC Western Blot Editor");
 
-        // Create Graphical Interface (GUI)
-       //resize button
+        // Create Graphical Interface
+          // Buttons and Listeners
         buttonResize = new JButton("Resize");
         buttonResize.addActionListener(this);
-        
-      //EdgeDetector button
-        buttonEdgeDetector = new JButton("EdgeDetector");
-        buttonEdgeDetector.addActionListener(this);
-        
-      //Invert button
+        buttonCrop = new JButton("Crop");
+        buttonCrop.addActionListener(this);
         buttonInvert = new JButton("Invert");
         buttonInvert.addActionListener(this);
-        
-       //Bright/Contrast button
         buttonBrightnessContrast = new JButton("Bright/Contrast");
         buttonInvert.addActionListener(this);
-        
-      //Reset button
         buttonReset = new JButton("Reset");
         buttonReset.addActionListener(this);
-        
+            // Create menu items
+        fileOpen = new JMenuItem("Open");
+        fileOpen.addActionListener(this);
+        fileSave = new JMenuItem("Save");
+        fileSave.addActionListener(this);
+        fileSaveAs = new JMenuItem("Save As");
+        fileSaveAs.addActionListener(this);
+        editReset = new JMenuItem("Reset");
+        editReset.addActionListener(this);
+        toolsCrop = new JMenuItem("Crop");
+        toolsCrop.addActionListener(this);
+        toolsBC = new JMenuItem("Brightness/Contrast");
+        toolsBC.addActionListener(this);
+        toolsResize = new JMenuItem("Resize");
+        toolsResize.addActionListener(this);
+            // Create Menu and Add Menu Items
+        file = new JMenu("File");
+        edit = new JMenu("Edit");
+        tools = new JMenu("Tools");
+        file.add(fileOpen);
+        file.add(fileSave);
+        file.add(fileSaveAs);
+        edit.add(editReset);
+        tools.add(toolsCrop);
+        tools.add(toolsBC);
+        tools.add(toolsResize);
+            // Create Menu Bar
+        mb = new JMenuBar();
+        mb.add(file);
+        mb.add(edit);
+        mb.add(tools);
+            // Add Top Menu Bar
+        menuBar = new JPanel();
+        menuBar.setLayout(new BorderLayout());
+        menuBar.add(mb);
+            // Add Buttons
         panelBottom = new JPanel();
-        
-        //Might not need panel buttons on bottom if we allow user to choose from menu bar 
-        
         panelBottom.add(buttonResize);
-        panelBottom.add(buttonEdgeDetector);
+        panelBottom.add(buttonCrop);
         panelBottom.add(buttonInvert);
         panelBottom.add(buttonBrightnessContrast);
         panelBottom.add(buttonReset);
-        
-        // ImagePanel
 
-        Container l_c = getContentPane();
-        l_c.setLayout(new BorderLayout());
-        l_c.add(panelBottom, BorderLayout.SOUTH);
-
-        // Load image
-
+        // Load Initial Image ** FIND A BETTER WAY TO DO THIS!! ***
         JFileChooser chooser = new JFileChooser();
         FileNameExtensionFilter filter = new FileNameExtensionFilter(
-                "JPG & GIF Images", "jpg", "gif");
+                "JPG, GIF, PNG Images", "jpg", "gif", "png");
         chooser.setFileFilter(filter);
-        textFieldImagePath = new JTextField(100);
+        JTextField textFieldImagePath = new JTextField(100);
         int returnVal = chooser.showOpenDialog(null);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             textFieldImagePath.setText(chooser.getSelectedFile().getAbsolutePath());
         }
-        String path = textFieldImagePath.getText();
-        JLabel imgLabel = new JLabel(new ImageIcon(path));
+        imagePath = textFieldImagePath.getText();
+        originalImage = imagePath;
+        File imgFile = new File(textFieldImagePath.getText());
+        BufferedImage img = ImageIO.read(imgFile);
+        ImageIcon icon = new ImageIcon(img);
+        JLabel image = new JLabel(icon);
+        imageScrollPane = new JScrollPane(image);
 
-        l_c.add(imgLabel, BorderLayout.CENTER);
 
-        // Menu
-        menuBar = new JPanel();
-        // create a menubar
-        JMenuBar mb = new JMenuBar();
-        // create a menu
-        JMenu file = new JMenu("File");
-        JMenu edit = new JMenu("Edit");
-        JMenu tools = new JMenu("Image");
-        // create menuitems
-        JMenuItem file1 = new JMenuItem("Open File");
-        Image img = new ImageIcon(this.getClass().getResource("Open-file-icon.png")).getImage();
-        file1.setIcon(new ImageIcon(img));
-        
-        JMenuItem file2 = new JMenuItem("Save");
-        Image save = new ImageIcon(this.getClass().getResource("Save-icon.png")).getImage();
-        file2.setIcon(new ImageIcon(save));
-        
-        JMenuItem file3 = new JMenuItem("Save As");
-        Image saveas = new ImageIcon(this.getClass().getResource("Save-icon.png")).getImage();
-        file3.setIcon(new ImageIcon(saveas));
-        
-        JMenuItem edit1 = new JMenuItem("Reset");
-        JMenuItem tools1 = new JMenuItem("Brightness");
-        JMenuItem tools2 = new JMenuItem("Resize");
-        // add menu items to menu
-        file.add(file1);
-        
-        JSeparator separator_1 = new JSeparator();
-        file.add(separator_1);
-        file.add(file2);
-        file.add(file3);
-        edit.add(edit1);
-        tools.add(tools1);
-        
-        JMenuItem mntmNewMenuItem_1 = new JMenuItem("Contrast");
-        tools.add(mntmNewMenuItem_1);
-        tools.add(tools2);
-        // add menu to menu bar
-        mb.add(file);
-        
-        JSeparator separator = new JSeparator();
-        file.add(separator);
-        
-        JMenuItem mntmNewMenuItem = new JMenuItem("Exit");
-        Image exit = new ImageIcon(this.getClass().getResource("exit-icon.png")).getImage();
-        mntmNewMenuItem.setIcon(new ImageIcon(exit));
-        mntmNewMenuItem.addActionListener(new ActionListener() {
-        	public void actionPerformed(ActionEvent e) {
-        		System.exit(JFrame.EXIT_ON_CLOSE);
-        	}
-        });
-        file.add(mntmNewMenuItem);
-        mb.add(edit);
-        mb.add(tools);
-        
-        JMenuItem mntmNewMenuItem_2 = new JMenuItem("Invert");
-        tools.add(mntmNewMenuItem_2);
-        // add menubar to panel
-        menuBar.setLayout(new BorderLayout());
-        menuBar.add(mb);
-        
-        JMenu mnNewMenu = new JMenu("Analyze");
-        mb.add(mnNewMenu);
+        // Add to GUI
+        l_c = getContentPane();
+        l_c.setLayout(new BorderLayout());
         l_c.add(menuBar, BorderLayout.NORTH);
+        l_c.add(panelBottom, BorderLayout.WEST);
+        l_c.add(imageScrollPane, BorderLayout.EAST);
         setVisible(true);
         pack();
     }
 
-    public static void main(String args[]) throws FileNotFoundException {
+    public static void main(String args[]) throws IOException {
         Gui t = new Gui();
         t.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
-    public void actionPerformed(ActionEvent e) {
-
-        FileWriter writer = null;
-        {
-            try {
-                // creates empty bash script
-                writer = new FileWriter("bash_output.sh");
-                // header for bash script
-                writer.write(
-                        "#!/bin/bash\n" +
-                                "#-------------------------------------------------------\n" +
-                                "# Bash-script autogenerated by im4java\n" +
-                                "# at " + Calendar.getInstance().getTime() + "\n" +
-                                "#-------------------------------------------------------\n"
-                );
-            } catch (IOException ex) {
-                ex.printStackTrace();
+    public void actionPerformed(ActionEvent e){
+        if(e.getSource() == fileOpen){
+            JFileChooser chooser = new JFileChooser();
+            FileNameExtensionFilter filter = new FileNameExtensionFilter(
+                    "JPG, GIF, PNG Images", "jpg", "gif", "png");
+            chooser.setFileFilter(filter);
+            JTextField textFieldImagePath = new JTextField(100);
+            int returnVal = chooser.showOpenDialog(null);
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                textFieldImagePath.setText(chooser.getSelectedFile().getAbsolutePath());
             }
+            imagePath = textFieldImagePath.getText();
+            originalImage = imagePath;
+            File imgFile = new File(imagePath);
+            BufferedImage img;
+            try {
+                img = ImageIO.read(imgFile);
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+            ImageIcon icon = new ImageIcon(img);
+            JLabel image = new JLabel(icon);
+            l_c.remove(imageScrollPane);
+            imageScrollPane = new JScrollPane(image);
+            l_c.add(imageScrollPane);
+            l_c.revalidate();
+        }
+        else if(e.getSource() == fileSave){
 
-            if (e.getSource() == buttonResize) {
-                try {
-                    // create command
-                    ConvertCmd cmd = new ConvertCmd();
-                    // create the operation, add images and operators/options
-                    IMOperation op = new IMOperation();
-                    op.addImage(textFieldImagePath.getText());
-                    op.resize(200, 300);
-                    op.addImage(textFieldImagePath.getText().replace(".jpg", "_resize.jpg"));
-                    // execute the operation
-                    cmd.run(op);
+        }
+        else if(e.getSource() == fileSaveAs){
 
-                } catch (InterruptedException | IOException | IM4JavaException except) {
-                    except.printStackTrace();
-                }
+        }
+        else if(e.getSource() == buttonReset | e.getSource() == editReset){
+            imagePath = originalImage;
+            File imgFile = new File(imagePath);
+            BufferedImage img;
+            try {
+                img = ImageIO.read(imgFile);
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+            ImageIcon icon = new ImageIcon(img);
+            JLabel image = new JLabel(icon);
+            l_c.remove(imageScrollPane);
+            imageScrollPane = new JScrollPane(image);
+            l_c.add(imageScrollPane);
+            l_c.revalidate();
+        }
+
+        else if(e.getSource() == buttonCrop | e.getSource() == toolsCrop){
+
+        }
+        else if(e.getSource() == buttonBrightnessContrast | e.getSource() == toolsBC){
+
+        }
+        else if (e.getSource() == buttonResize | e.getSource() == toolsResize) {
+            try {
+                // resize dialogue
+                JTextField width = new JTextField(5);
+                JTextField height = new JTextField(5);
+                JPanel resizePanel = new JPanel();
+                resizePanel.setLayout(new GridLayout(2,2));
+                resizePanel.add(new JLabel("Width: "));
+                resizePanel.add(width);
+                resizePanel.add(new JLabel("Height: "));
+                resizePanel.add(height);
+                JOptionPane.showConfirmDialog(null, resizePanel,
+                        "Resize Dimensions", JOptionPane.OK_CANCEL_OPTION);
+                // ImageMagick Call
+                ConvertCmd cmd = new ConvertCmd();
+                // create the operation, add images and operators/options
+                IMOperation op = new IMOperation();
+                op.addImage(imagePath);
+                op.resize(Integer.parseInt(width.getText()), Integer.parseInt(height.getText()));
+                newImage = imagePath.replace(".jpg", "_resize.jpg");
+                op.addImage(newImage);
+                // execute the operation
+                cmd.run(op);
+                imagePath = newImage;
+                File imgFile = new File(imagePath);
+                BufferedImage img;
                 try {
-                    writer.write("\nThe RESIZE line");
+                    img = ImageIO.read(imgFile);
                 } catch (IOException ex) {
-                    ex.printStackTrace();
+                    throw new RuntimeException(ex);
                 }
-                try {
-                    writer.close();
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
-
-            } else if (e.getSource() == buttonEdgeDetector) {
-
-            } else if (e.getSource() == buttonInvert) {
-
-            } else if (e.getSource() == buttonBrightnessContrast) {
-                }
+                ImageIcon icon = new ImageIcon(img);
+                JLabel image = new JLabel(icon);
+                l_c.remove(imageScrollPane);
+                imageScrollPane = new JScrollPane(image);
+                l_c.add(imageScrollPane);
+                l_c.revalidate();
+            }
+            catch (InterruptedException | IOException | IM4JavaException except){
+                except.printStackTrace();
             }
         }
+
+        else if(e.getSource() == buttonInvert){
+
+        }
     }
+        }
