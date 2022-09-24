@@ -15,6 +15,8 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import java.util.*;
+import java.util.List;
 
 import org.im4java.core.ConvertCmd;
 import org.im4java.core.IMOperation;
@@ -23,15 +25,28 @@ import org.im4java.core.IM4JavaException;
 
 public class Gui extends JFrame implements ActionListener
 {
-    private JPanel panelBottom, menuBar;
-    private JButton buttonResize, buttonCrop, buttonMonochrome, buttonBrightnessContrast, buttonReset;
-
-    private JMenu file, edit, tools;
-    private JMenuItem fileOpen, fileSave, fileSaveAs, editReset, toolsCrop, toolsBC, toolsResize, toolsMonochrome;
-    private JMenuBar mb;
+    private final JButton buttonResize;
+    private final JButton buttonCrop;
+    private final JButton buttonMonochrome;
+    private final JButton buttonInvert;
+    private final JButton buttonBrightnessContrast;
+    private final JButton buttonReset;
+    private final JMenuItem fileOpen;
+    private final JMenuItem fileSave;
+    private final JMenuItem fileSaveAs;
+    private final JMenuItem editReset;
+    private final JMenuItem toolsCrop;
+    private final JMenuItem toolsBC;
+    private final JMenuItem toolsResize;
+    private final JMenuItem toolsMonochrome;
+    private final JMenuItem toolsInvert;
+    private final JMenuItem historyShowHistory;
     private JScrollPane imageScrollPane;
-    private Container l_c;
-    private String imagePath, newImage, originalImage;
+    private final Container l_c;
+    private String imagePath;
+    private String originalImage;
+    List<String> historyList = new ArrayList<>(
+            Arrays.asList());
 
 
     public Gui() throws IOException {
@@ -41,6 +56,8 @@ public class Gui extends JFrame implements ActionListener
           // Buttons and Listeners
         buttonResize = new JButton("Resize");
         buttonResize.addActionListener(this);
+        buttonInvert = new JButton("Invert");
+        buttonInvert.addActionListener(this);
         buttonCrop = new JButton("Crop");
         buttonCrop.addActionListener(this);
         buttonMonochrome = new JButton("Monochrome");
@@ -66,10 +83,16 @@ public class Gui extends JFrame implements ActionListener
         toolsResize.addActionListener(this);
         toolsMonochrome = new JMenuItem("Monochrome");
         toolsMonochrome.addActionListener(this);
+        toolsInvert = new JMenuItem("Invert");
+        toolsInvert.addActionListener(this);
+        historyShowHistory = new JMenuItem("Show History");
+        historyShowHistory.addActionListener(this);
             // Create Menu and Add Menu Items
-        file = new JMenu("File");
-        edit = new JMenu("Edit");
-        tools = new JMenu("Tools");
+        JMenu file = new JMenu("File");
+        JMenu edit = new JMenu("Edit");
+        JMenu tools = new JMenu("Tools");
+        JMenu history = new JMenu("History");
+        history.add(historyShowHistory);
         file.add(fileOpen);
         file.add(fileSave);
         file.add(fileSaveAs);
@@ -78,21 +101,25 @@ public class Gui extends JFrame implements ActionListener
         tools.add(toolsBC);
         tools.add(toolsResize);
         tools.add(toolsMonochrome);
+        tools.add(toolsInvert);
             // Create Menu Bar
-        mb = new JMenuBar();
+        JMenuBar mb = new JMenuBar();
         mb.add(file);
         mb.add(edit);
         mb.add(tools);
+        mb.add(history);
             // Add Top Menu Bar
-        menuBar = new JPanel();
+        JPanel menuBar = new JPanel();
         menuBar.setLayout(new BorderLayout());
         menuBar.add(mb);
             // Add Buttons
-        panelBottom = new JPanel();
+        JPanel panelBottom = new JPanel();
         panelBottom.add(buttonResize);
         panelBottom.add(buttonCrop);
         panelBottom.add(buttonMonochrome);
+        panelBottom.add(new JSeparator(SwingConstants.HORIZONTAL));
         panelBottom.add(buttonBrightnessContrast);
+        panelBottom.add(buttonInvert);
         panelBottom.add(buttonReset);
 
         // Load Initial Image ** FIND A BETTER WAY TO DO THIS!! ***
@@ -117,9 +144,9 @@ public class Gui extends JFrame implements ActionListener
         // Add to GUI
         l_c = getContentPane();
         l_c.setLayout(new BorderLayout());
-        l_c.add(menuBar, BorderLayout.NORTH);
-        l_c.add(panelBottom, BorderLayout.WEST);
-        l_c.add(imageScrollPane, BorderLayout.EAST);
+        l_c.add(menuBar, BorderLayout.PAGE_START);
+        l_c.add(panelBottom, BorderLayout.LINE_START);
+        l_c.add(imageScrollPane, BorderLayout.LINE_END);
         setVisible(true);
         pack();
     }
@@ -145,6 +172,8 @@ public class Gui extends JFrame implements ActionListener
         return slider;
     }
     public void actionPerformed(ActionEvent e){
+        String newImage;
+
         if(e.getSource() == fileOpen){
             JFileChooser chooser = new JFileChooser();
             FileNameExtensionFilter filter = new FileNameExtensionFilter(
@@ -175,6 +204,25 @@ public class Gui extends JFrame implements ActionListener
         else if(e.getSource() == fileSave){
 
         }
+        else if(e.getSource() == historyShowHistory){
+            JTextArea textArea = new JTextArea();
+            JScrollPane textScrollPane = new JScrollPane(textArea);
+            textArea.setEditable(false);
+            for (int i=0; i<historyList.size(); i++){
+                textArea.append(i+1 + ". "+ historyList.get(i) + "\n");
+            }
+            JPanel historyPanel = new JPanel();
+            historyPanel.setLayout(new GridLayout(2,2));
+            historyPanel.add(textScrollPane);
+            JFrame historyFrame = new JFrame();
+            historyFrame.add(historyPanel);
+            historyFrame.setVisible(true);
+            historyFrame.setTitle("Operations History");
+            historyFrame.setDefaultCloseOperation(EXIT_ON_CLOSE);
+            historyFrame.setSize(700, 500);
+            historyFrame.pack();
+
+        }
         else if(e.getSource() == fileSaveAs){
 
         }
@@ -193,6 +241,7 @@ public class Gui extends JFrame implements ActionListener
             imageScrollPane = new JScrollPane(image);
             l_c.add(imageScrollPane);
             l_c.revalidate();
+            historyList.clear();
         }
 
         else if(e.getSource() == buttonCrop | e.getSource() == toolsCrop){
@@ -224,6 +273,8 @@ public class Gui extends JFrame implements ActionListener
             newImage = imagePath.replace(".jpg", "_brightness"+brightSlider.getValue()+"&contrast"+contrastSlider.getValue()+".jpg");
                 // ImageMagick write newImage
             op.addImage(newImage);
+            historyList.add("brightness: "+brightSlider.getValue()+" contrast: "+contrastSlider.getValue());
+            System.out.println(historyList);
             try {
                 cmd.run(op);
             } catch (IOException | IM4JavaException | InterruptedException ex) {
@@ -297,6 +348,36 @@ public class Gui extends JFrame implements ActionListener
             op.addImage(imagePath);
             op.monochrome();
             newImage = imagePath.replace(".jpg", "_monochrome.jpg");
+            op.addImage(newImage);
+            // execute the operation
+            try {
+                cmd.run(op);
+            } catch (IOException | InterruptedException | IM4JavaException ex) {
+                throw new RuntimeException(ex);
+            }
+            imagePath = newImage;
+            File imgFile = new File(imagePath);
+            BufferedImage img;
+            try {
+                img = ImageIO.read(imgFile);
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+            ImageIcon icon = new ImageIcon(img);
+            JLabel image = new JLabel(icon);
+            l_c.remove(imageScrollPane);
+            imageScrollPane = new JScrollPane(image);
+            l_c.add(imageScrollPane);
+            l_c.revalidate();
+        }
+        else if(e.getSource() == buttonInvert | e.getSource() == toolsInvert){
+            // ImageMagick Call
+            ConvertCmd cmd = new ConvertCmd();
+            // create the operation, add images and operators/options
+            IMOperation op = new IMOperation();
+            op.addImage(imagePath);
+            op.negate();
+            newImage = imagePath.replace(".jpg", "_negate.jpg");
             op.addImage(newImage);
             // execute the operation
             try {
