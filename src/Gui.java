@@ -219,7 +219,6 @@ public class Gui extends JFrame implements ActionListener
             historyFrame.add(historyPanel);
             historyFrame.setVisible(true);
             historyFrame.setTitle("Operations History");
-            historyFrame.setDefaultCloseOperation(EXIT_ON_CLOSE);
             historyFrame.pack();
 
         }
@@ -319,7 +318,7 @@ public class Gui extends JFrame implements ActionListener
                 op.addImage(newImage);
                 // execute the operation
                 cmd.run(op);
-                historyList.add("resize: " + width + "x" + height);
+                historyList.add("resize: " + Integer.parseInt(width.getText()) + "x" + Integer.parseInt(height.getText()));
                 imagePath = newImage;
                 File imgFile = new File(imagePath);
                 BufferedImage img;
