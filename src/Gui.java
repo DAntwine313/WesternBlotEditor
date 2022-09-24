@@ -214,12 +214,12 @@ public class Gui extends JFrame implements ActionListener
             JPanel historyPanel = new JPanel();
             historyPanel.setLayout(new GridLayout(2,2));
             historyPanel.add(textScrollPane);
+            historyPanel.setSize(700, 500);
             JFrame historyFrame = new JFrame();
             historyFrame.add(historyPanel);
             historyFrame.setVisible(true);
             historyFrame.setTitle("Operations History");
             historyFrame.setDefaultCloseOperation(EXIT_ON_CLOSE);
-            historyFrame.setSize(700, 500);
             historyFrame.pack();
 
         }
@@ -274,7 +274,6 @@ public class Gui extends JFrame implements ActionListener
                 // ImageMagick write newImage
             op.addImage(newImage);
             historyList.add("brightness: "+brightSlider.getValue()+" contrast: "+contrastSlider.getValue());
-            System.out.println(historyList);
             try {
                 cmd.run(op);
             } catch (IOException | IM4JavaException | InterruptedException ex) {
@@ -320,6 +319,7 @@ public class Gui extends JFrame implements ActionListener
                 op.addImage(newImage);
                 // execute the operation
                 cmd.run(op);
+                historyList.add("resize: " + width + "x" + height);
                 imagePath = newImage;
                 File imgFile = new File(imagePath);
                 BufferedImage img;
@@ -355,6 +355,7 @@ public class Gui extends JFrame implements ActionListener
             } catch (IOException | InterruptedException | IM4JavaException ex) {
                 throw new RuntimeException(ex);
             }
+            historyList.add("monochrome");
             imagePath = newImage;
             File imgFile = new File(imagePath);
             BufferedImage img;
@@ -378,6 +379,7 @@ public class Gui extends JFrame implements ActionListener
             op.addImage(imagePath);
             op.negate();
             newImage = imagePath.replace(".jpg", "_negate.jpg");
+            historyList.add("invert/negate");
             op.addImage(newImage);
             // execute the operation
             try {
