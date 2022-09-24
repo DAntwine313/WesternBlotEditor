@@ -12,6 +12,8 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.im4java.core.ConvertCmd;
@@ -22,11 +24,10 @@ import org.im4java.core.IM4JavaException;
 public class Gui extends JFrame implements ActionListener
 {
     private JPanel panelBottom, menuBar;
-    private JLabel imgLabel;
-    private JButton buttonResize, buttonCrop, buttonInvert, buttonBrightnessContrast, buttonReset;
+    private JButton buttonResize, buttonCrop, buttonMonochrome, buttonBrightnessContrast, buttonReset;
 
     private JMenu file, edit, tools;
-    private JMenuItem fileOpen, fileSave, fileSaveAs, editReset, toolsCrop, toolsBC, toolsResize;
+    private JMenuItem fileOpen, fileSave, fileSaveAs, editReset, toolsCrop, toolsBC, toolsResize, toolsMonochrome;
     private JMenuBar mb;
     private JScrollPane imageScrollPane;
     private Container l_c;
@@ -42,10 +43,10 @@ public class Gui extends JFrame implements ActionListener
         buttonResize.addActionListener(this);
         buttonCrop = new JButton("Crop");
         buttonCrop.addActionListener(this);
-        buttonInvert = new JButton("Invert");
-        buttonInvert.addActionListener(this);
+        buttonMonochrome = new JButton("Monochrome");
+        buttonMonochrome.addActionListener(this);
         buttonBrightnessContrast = new JButton("Bright/Contrast");
-        buttonInvert.addActionListener(this);
+        buttonBrightnessContrast.addActionListener(this);
         buttonReset = new JButton("Reset");
         buttonReset.addActionListener(this);
             // Create menu items
@@ -63,6 +64,8 @@ public class Gui extends JFrame implements ActionListener
         toolsBC.addActionListener(this);
         toolsResize = new JMenuItem("Resize");
         toolsResize.addActionListener(this);
+        toolsMonochrome = new JMenuItem("Monochrome");
+        toolsMonochrome.addActionListener(this);
             // Create Menu and Add Menu Items
         file = new JMenu("File");
         edit = new JMenu("Edit");
@@ -74,6 +77,7 @@ public class Gui extends JFrame implements ActionListener
         tools.add(toolsCrop);
         tools.add(toolsBC);
         tools.add(toolsResize);
+        tools.add(toolsMonochrome);
             // Create Menu Bar
         mb = new JMenuBar();
         mb.add(file);
@@ -87,7 +91,7 @@ public class Gui extends JFrame implements ActionListener
         panelBottom = new JPanel();
         panelBottom.add(buttonResize);
         panelBottom.add(buttonCrop);
-        panelBottom.add(buttonInvert);
+        panelBottom.add(buttonMonochrome);
         panelBottom.add(buttonBrightnessContrast);
         panelBottom.add(buttonReset);
 
@@ -125,6 +129,21 @@ public class Gui extends JFrame implements ActionListener
         t.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
+    // JSlider optionPane For Brightness Contrast
+    static JSlider getSlider(final JOptionPane optionPane) {
+        JSlider slider = new JSlider(-127, 127, 0);
+        slider.setMajorTickSpacing(50);
+        slider.setPaintTicks(true);
+        slider.setPaintLabels(true);
+        ChangeListener changeListener = changeEvent -> {
+            JSlider theSlider = (JSlider) changeEvent.getSource();
+            if (!theSlider.getValueIsAdjusting()) {
+                optionPane.setInputValue(new Integer(theSlider.getValue()));
+            }
+        };
+        slider.addChangeListener(changeListener);
+        return slider;
+    }
     public void actionPerformed(ActionEvent e){
         if(e.getSource() == fileOpen){
             JFileChooser chooser = new JFileChooser();
@@ -137,6 +156,7 @@ public class Gui extends JFrame implements ActionListener
                 textFieldImagePath.setText(chooser.getSelectedFile().getAbsolutePath());
             }
             imagePath = textFieldImagePath.getText();
+            // Set original path to use with reset
             originalImage = imagePath;
             File imgFile = new File(imagePath);
             BufferedImage img;
@@ -178,12 +198,57 @@ public class Gui extends JFrame implements ActionListener
         else if(e.getSource() == buttonCrop | e.getSource() == toolsCrop){
 
         }
-        else if(e.getSource() == buttonBrightnessContrast | e.getSource() == toolsBC){
 
+        else if(e.getSource() == buttonBrightnessContrast | e.getSource() == toolsBC){
+            // Pop up window for brightness contrast params
+            JPanel bcPanel = new JPanel();
+            bcPanel.setLayout(new GridLayout(2,1));
+            JOptionPane optionBPane = new JOptionPane();
+            JSlider brightSlider = getSlider(optionBPane);
+            JTextField brightness = new JTextField(3);
+            brightness.setText((String) optionBPane.getInputValue());
+            optionBPane.setMessage(new Object[] { "Select a Brightness: ", brightness, brightSlider });
+            JOptionPane optionCPane = new JOptionPane();
+            JSlider contrastSlider = getSlider(optionCPane);
+            optionCPane.setMessage(new Object[] { "Select a Contrast: ", contrastSlider });
+            bcPanel.add(optionBPane);
+            bcPanel.add(optionCPane);
+            JOptionPane.showConfirmDialog(null, bcPanel,
+                    "Brightness / Contrast", JOptionPane.OK_CANCEL_OPTION);
+            // ImageMagick Call
+            ConvertCmd cmd = new ConvertCmd();
+            IMOperation op = new IMOperation();
+            op.addImage(imagePath);
+            op.brightnessContrast((double) brightSlider.getValue(), (double) contrastSlider.getValue());
+                // Label new image with update
+            newImage = imagePath.replace(".jpg", "_brightness"+brightSlider.getValue()+"&contrast"+contrastSlider.getValue()+".jpg");
+                // ImageMagick write newImage
+            op.addImage(newImage);
+            try {
+                cmd.run(op);
+            } catch (IOException | IM4JavaException | InterruptedException ex) {
+                throw new RuntimeException(ex);
+            }
+                // Update image path and reload image in JscrollPane
+            imagePath = newImage;
+            File imgFile = new File(imagePath);
+            BufferedImage img;
+            try {
+                img = ImageIO.read(imgFile);
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+            ImageIcon icon = new ImageIcon(img);
+            JLabel image = new JLabel(icon);
+            l_c.remove(imageScrollPane);
+            imageScrollPane = new JScrollPane(image);
+            l_c.add(imageScrollPane);
+            l_c.revalidate();
         }
+
         else if (e.getSource() == buttonResize | e.getSource() == toolsResize) {
             try {
-                // resize dialogue
+                // resize popup
                 JTextField width = new JTextField(5);
                 JTextField height = new JTextField(5);
                 JPanel resizePanel = new JPanel();
@@ -224,8 +289,35 @@ public class Gui extends JFrame implements ActionListener
             }
         }
 
-        else if(e.getSource() == buttonInvert){
-
+        else if(e.getSource() == buttonMonochrome | e.getSource() == toolsMonochrome){
+            // ImageMagick Call
+            ConvertCmd cmd = new ConvertCmd();
+            // create the operation, add images and operators/options
+            IMOperation op = new IMOperation();
+            op.addImage(imagePath);
+            op.monochrome();
+            newImage = imagePath.replace(".jpg", "_monochrome.jpg");
+            op.addImage(newImage);
+            // execute the operation
+            try {
+                cmd.run(op);
+            } catch (IOException | InterruptedException | IM4JavaException ex) {
+                throw new RuntimeException(ex);
+            }
+            imagePath = newImage;
+            File imgFile = new File(imagePath);
+            BufferedImage img;
+            try {
+                img = ImageIO.read(imgFile);
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+            ImageIcon icon = new ImageIcon(img);
+            JLabel image = new JLabel(icon);
+            l_c.remove(imageScrollPane);
+            imageScrollPane = new JScrollPane(image);
+            l_c.add(imageScrollPane);
+            l_c.revalidate();
         }
     }
         }
