@@ -26,7 +26,7 @@ import org.im4java.core.IM4JavaException;
 public class Gui extends JFrame implements ActionListener
 {
     private final JButton buttonResize;
-    private final JButton buttonCrop;
+    private final JButton buttonEdge;
     private final JButton buttonMonochrome;
     private final JButton buttonInvert;
     private final JButton buttonBrightnessContrast;
@@ -35,7 +35,7 @@ public class Gui extends JFrame implements ActionListener
     private final JMenuItem fileSave;
     private final JMenuItem fileSaveAs;
     private final JMenuItem editReset;
-    private final JMenuItem toolsCrop;
+    private final JMenuItem toolsEdge;
     private final JMenuItem toolsBC;
     private final JMenuItem toolsResize;
     private final JMenuItem toolsMonochrome;
@@ -58,8 +58,8 @@ public class Gui extends JFrame implements ActionListener
         buttonResize.addActionListener(this);
         buttonInvert = new JButton("Invert");
         buttonInvert.addActionListener(this);
-        buttonCrop = new JButton("Crop");
-        buttonCrop.addActionListener(this);
+        buttonEdge = new JButton("Edge");
+        buttonEdge.addActionListener(this);
         buttonMonochrome = new JButton("Monochrome");
         buttonMonochrome.addActionListener(this);
         buttonBrightnessContrast = new JButton("Bright/Contrast");
@@ -75,8 +75,8 @@ public class Gui extends JFrame implements ActionListener
         fileSaveAs.addActionListener(this);
         editReset = new JMenuItem("Reset");
         editReset.addActionListener(this);
-        toolsCrop = new JMenuItem("Crop");
-        toolsCrop.addActionListener(this);
+        toolsEdge = new JMenuItem("Edge");
+        toolsEdge.addActionListener(this);
         toolsBC = new JMenuItem("Brightness/Contrast");
         toolsBC.addActionListener(this);
         toolsResize = new JMenuItem("Resize");
@@ -97,7 +97,7 @@ public class Gui extends JFrame implements ActionListener
         file.add(fileSave);
         file.add(fileSaveAs);
         edit.add(editReset);
-        tools.add(toolsCrop);
+        tools.add(toolsEdge);
         tools.add(toolsBC);
         tools.add(toolsResize);
         tools.add(toolsMonochrome);
@@ -115,9 +115,8 @@ public class Gui extends JFrame implements ActionListener
             // Add Buttons
         JPanel panelBottom = new JPanel();
         panelBottom.add(buttonResize);
-        panelBottom.add(buttonCrop);
+        panelBottom.add(buttonEdge);
         panelBottom.add(buttonMonochrome);
-        panelBottom.add(new JSeparator(SwingConstants.HORIZONTAL));
         panelBottom.add(buttonBrightnessContrast);
         panelBottom.add(buttonInvert);
         panelBottom.add(buttonReset);
@@ -243,10 +242,37 @@ public class Gui extends JFrame implements ActionListener
             historyList.clear();
         }
 
-        else if(e.getSource() == buttonCrop | e.getSource() == toolsCrop){
-
+        else if(e.getSource() == buttonEdge | e.getSource() == toolsEdge){
+            // ImageMagick Call
+            ConvertCmd cmd = new ConvertCmd();
+            // create the operation, add images and operators/options
+            IMOperation op = new IMOperation();
+            op.addImage(imagePath);
+            op.edge(1.0);
+            newImage = imagePath.replace(".jpg", "_edge.jpg");
+            op.addImage(newImage);
+            // execute the operation
+            try {
+                cmd.run(op);
+            } catch (IOException | InterruptedException | IM4JavaException ex) {
+                throw new RuntimeException(ex);
+            }
+            historyList.add("Edge");
+            imagePath = newImage;
+            File imgFile = new File(imagePath);
+            BufferedImage img;
+            try {
+                img = ImageIO.read(imgFile);
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+            ImageIcon icon = new ImageIcon(img);
+            JLabel image = new JLabel(icon);
+            l_c.remove(imageScrollPane);
+            imageScrollPane = new JScrollPane(image);
+            l_c.add(imageScrollPane);
+            l_c.revalidate();
         }
-
         else if(e.getSource() == buttonBrightnessContrast | e.getSource() == toolsBC){
             // Pop up window for brightness contrast params
             JPanel bcPanel = new JPanel();
@@ -294,7 +320,6 @@ public class Gui extends JFrame implements ActionListener
             l_c.add(imageScrollPane);
             l_c.revalidate();
         }
-
         else if (e.getSource() == buttonResize | e.getSource() == toolsResize) {
             try {
                 // resize popup
@@ -338,7 +363,6 @@ public class Gui extends JFrame implements ActionListener
                 except.printStackTrace();
             }
         }
-
         else if(e.getSource() == buttonMonochrome | e.getSource() == toolsMonochrome){
             // ImageMagick Call
             ConvertCmd cmd = new ConvertCmd();
