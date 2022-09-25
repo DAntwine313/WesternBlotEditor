@@ -12,7 +12,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.util.*;
@@ -46,7 +45,7 @@ public class Gui extends JFrame implements ActionListener
     private String imagePath;
     private String originalImage;
     List<String> historyList = new ArrayList<>(
-            Arrays.asList());
+            List.of());
 
 
     public Gui() throws IOException {
@@ -97,9 +96,14 @@ public class Gui extends JFrame implements ActionListener
         file.add(fileSave);
         file.add(fileSaveAs);
         edit.add(editReset);
+        tools.add(new JLabel("Detect Lines"));
         tools.add(toolsEdge);
-        tools.add(toolsBC);
+        tools.add(new JSeparator());
+        tools.add(new JLabel("Transform"));
         tools.add(toolsResize);
+        tools.add(new JSeparator());
+        tools.add(new JLabel("Image Color"));
+        tools.add(toolsBC);
         tools.add(toolsMonochrome);
         tools.add(toolsInvert);
             // Create Menu Bar
@@ -150,7 +154,7 @@ public class Gui extends JFrame implements ActionListener
         pack();
     }
 
-    public static void main(String args[]) throws IOException {
+    public static void main(String[] args) throws IOException {
         Gui t = new Gui();
         t.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
@@ -164,7 +168,7 @@ public class Gui extends JFrame implements ActionListener
         ChangeListener changeListener = changeEvent -> {
             JSlider theSlider = (JSlider) changeEvent.getSource();
             if (!theSlider.getValueIsAdjusting()) {
-                optionPane.setInputValue(new Integer(theSlider.getValue()));
+                optionPane.setInputValue(theSlider.getValue());
             }
         };
         slider.addChangeListener(changeListener);
@@ -198,6 +202,7 @@ public class Gui extends JFrame implements ActionListener
             l_c.remove(imageScrollPane);
             imageScrollPane = new JScrollPane(image);
             l_c.add(imageScrollPane);
+            historyList.clear();
             l_c.revalidate();
         }
         else if(e.getSource() == fileSave){
@@ -214,12 +219,19 @@ public class Gui extends JFrame implements ActionListener
             historyPanel.setLayout(new GridLayout(2,2));
             historyPanel.add(textScrollPane);
             historyPanel.setSize(700, 500);
+            JButton exportHistory = new JButton("Export History");
+            exportHistory.addActionListener(this);
+            historyPanel.add(exportHistory);
+            if (e.getSource() == exportHistory){
+                System.out.println(historyList);
+            }
             JFrame historyFrame = new JFrame();
+            
             historyFrame.add(historyPanel);
             historyFrame.setVisible(true);
             historyFrame.setTitle("Operations History");
             historyFrame.pack();
-
+            
         }
         else if(e.getSource() == fileSaveAs){
 
@@ -243,12 +255,19 @@ public class Gui extends JFrame implements ActionListener
         }
 
         else if(e.getSource() == buttonEdge | e.getSource() == toolsEdge){
+            JTextField thickness = new JTextField();
+            JPanel edgePanel = new JPanel();
+            edgePanel.setLayout(new GridLayout(2,2));
+            edgePanel.add(new JLabel("Thickness: "));
+            edgePanel.add(thickness);
+            JOptionPane.showConfirmDialog(null, edgePanel,
+                    "Edge Thickness", JOptionPane.OK_CANCEL_OPTION);
             // ImageMagick Call
             ConvertCmd cmd = new ConvertCmd();
             // create the operation, add images and operators/options
             IMOperation op = new IMOperation();
             op.addImage(imagePath);
-            op.edge(1.0);
+            op.edge(Double.parseDouble(thickness.getText()));
             newImage = imagePath.replace(".jpg", "_edge.jpg");
             op.addImage(newImage);
             // execute the operation
@@ -257,7 +276,7 @@ public class Gui extends JFrame implements ActionListener
             } catch (IOException | InterruptedException | IM4JavaException ex) {
                 throw new RuntimeException(ex);
             }
-            historyList.add("Edge");
+            historyList.add("edge: " + thickness.getText());
             imagePath = newImage;
             File imgFile = new File(imagePath);
             BufferedImage img;
@@ -304,7 +323,7 @@ public class Gui extends JFrame implements ActionListener
             } catch (IOException | IM4JavaException | InterruptedException ex) {
                 throw new RuntimeException(ex);
             }
-                // Update image path and reload image in JscrollPane
+                // Update image path and reload image in JScrollPane
             imagePath = newImage;
             File imgFile = new File(imagePath);
             BufferedImage img;
