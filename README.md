@@ -18,7 +18,7 @@ To control only brightness, set contrast=0 or just leave it off.
 -
 Detect edges within an image.
 
--Get Last Image
+-get last image
 -
 Feature may only be used to undo changes once until another modification has been made to allow for some forgiveness when manipulating image.
 

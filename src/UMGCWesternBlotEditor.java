@@ -27,7 +27,6 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
     private final JButton buttonLastImage;
     private final JButton exportHistory;
     private final JMenuItem fileOpen;
-    private final JMenuItem fileSave;
     private final JMenuItem fileSaveAs;
     private final JMenuItem editReset;
     private final JMenuItem toolsEdge;
@@ -42,6 +41,7 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
     private String imagePath;
     private String originalImage;
     private String lastImage;
+    private int opCount = 0;
     List<String> historyList = new ArrayList<>(
             List.of());
     public UMGCWesternBlotEditor() throws IOException {
@@ -67,8 +67,6 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
             // Create menu items
         fileOpen = new JMenuItem("Open");
         fileOpen.addActionListener(this);
-        fileSave = new JMenuItem("Save");
-        fileSave.addActionListener(this);
         fileSaveAs = new JMenuItem("Save As");
         fileSaveAs.addActionListener(this);
         editReset = new JMenuItem("Reset");
@@ -96,7 +94,6 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
         JMenu history = new JMenu("History");
         history.add(historyShowHistory);
         file.add(fileOpen);
-        file.add(fileSave);
         file.add(fileSaveAs);
         edit.add(editReset);
         tools.add(new JLabel("Detect Lines"));
@@ -175,20 +172,6 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
         t.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
     // JSlider optionPane For Brightness Contrast
-    static JSlider getSlider(final JOptionPane optionPane) {
-        JSlider slider = new JSlider(-100, 100, 0);
-        slider.setMajorTickSpacing(50);
-        slider.setPaintTicks(true);
-        slider.setPaintLabels(true);
-        ChangeListener changeListener = changeEvent -> {
-            JSlider theSlider = (JSlider) changeEvent.getSource();
-            if (!theSlider.getValueIsAdjusting()) {
-                optionPane.setInputValue(theSlider.getValue());
-            }
-        };
-        slider.addChangeListener(changeListener);
-        return slider;
-    }
     public void actionPerformed(ActionEvent e) {
         String newImage;
         if (e.getSource() == fileOpen) {
@@ -219,9 +202,6 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
             historyList.clear();
             l_c.revalidate();
             buttonLastImage.setEnabled(false);
-        }
-        else if (e.getSource() == fileSave) {
-
         }
         else if (e.getSource() == fileSaveAs) {
             JFileChooser fileChooser = new JFileChooser();
@@ -263,6 +243,7 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
 
         }
         else if (e.getSource() == buttonReset | e.getSource() == editReset) {
+            opCount = 0;
             imagePath = originalImage;
             File imgFile = new File(imagePath);
             BufferedImage img;
@@ -282,6 +263,7 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
             buttonLastImage.setEnabled(false);
         }
         else if (e.getSource() == buttonEdge | e.getSource() == toolsEdge) {
+            opCount++;
             JTextField thickness = new JTextField();
             JPanel edgePanel = new JPanel();
             edgePanel.setLayout(new GridLayout(2, 2));
@@ -295,7 +277,7 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
             IMOperation op = new IMOperation();
             op.addImage(imagePath);
             op.edge(Double.parseDouble(thickness.getText()));
-            newImage = imagePath.replace(".jpg", "_edge.jpg");
+            newImage = imagePath.replace(".jpg", "_"+opCount+".jpg");
             op.addImage(newImage);
             // execute the operation
             try {
@@ -322,18 +304,41 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
             buttonLastImage.setEnabled(true);
         }
         else if (e.getSource() == buttonBrightnessContrast | e.getSource() == toolsBC) {
+            opCount++;
             // Pop up window for brightness contrast params
                 //Change the JTextfield for brightness/contrast so that user can use slider to adjust value or type in the value.
             JPanel bcPanel = new JPanel();
             bcPanel.setLayout(new GridLayout(2, 1));
             JOptionPane optionBPane = new JOptionPane();
-            JSlider brightSlider = getSlider(optionBPane);
             JTextField brightness = new JTextField(3);
-            brightness.setText((String) optionBPane.getInputValue());
-            optionBPane.setMessage(new Object[]{"Select a Brightness: ", brightness, brightSlider});
+            JSlider sliderB = new JSlider(-100, 100, 0);
+            sliderB.setMajorTickSpacing(25);
+            sliderB.setPaintTicks(true);
+            sliderB.setPaintLabels(true);
+            ChangeListener changeListener = changeEvent -> {
+                JSlider theSlider = (JSlider) changeEvent.getSource();
+                if (!theSlider.getValueIsAdjusting()) {
+                    brightness.setText(String.valueOf(theSlider.getValue()));
+                }
+            };
+            sliderB.addChangeListener(changeListener);
+            brightness.setEditable(false);
+            optionBPane.setMessage(new Object[]{"Select a Brightness: ", brightness, sliderB});
             JOptionPane optionCPane = new JOptionPane();
-            JSlider contrastSlider = getSlider(optionCPane);
-            optionCPane.setMessage(new Object[]{"Select a Contrast: ", contrastSlider});
+            JTextField contrast = new JTextField(3);
+            JSlider sliderC = new JSlider(-100, 100, 0);
+            sliderC.setMajorTickSpacing(25);
+            sliderC.setPaintTicks(true);
+            sliderC.setPaintLabels(true);
+            ChangeListener changeListenerC = changeEvent -> {
+                JSlider theSliderC = (JSlider) changeEvent.getSource();
+                if (!theSliderC.getValueIsAdjusting()) {
+                    contrast.setText(String.valueOf(theSliderC.getValue()));
+                }
+            };
+            sliderC.addChangeListener(changeListenerC);
+            contrast.setEditable(false);
+            optionCPane.setMessage(new Object[]{"Select a Contrast: ", contrast, sliderC});
             bcPanel.add(optionBPane);
             bcPanel.add(optionCPane);
             JOptionPane.showConfirmDialog(null, bcPanel,
@@ -342,12 +347,12 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
             ConvertCmd cmd = new ConvertCmd();
             IMOperation op = new IMOperation();
             op.addImage(imagePath);
-            op.brightnessContrast((double) brightSlider.getValue(), (double) contrastSlider.getValue());
+            op.brightnessContrast((double) sliderB.getValue(), (double) sliderC.getValue());
             // Label new image with update
-            newImage = imagePath.replace(".jpg", "_brightness" + brightSlider.getValue() + "&contrast" + contrastSlider.getValue() + ".jpg");
+            newImage = imagePath.replace(".jpg", "_"+opCount+".jpg");
             // ImageMagick write newImage
             op.addImage(newImage);
-            historyList.add("brightness: " + brightSlider.getValue() + " contrast: " + contrastSlider.getValue());
+            historyList.add("brightness: " + sliderB.getValue() + " contrast: " + sliderC.getValue());
             try {
                 cmd.run(op);
             } catch (IOException | IM4JavaException | InterruptedException ex) {
@@ -373,6 +378,7 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
         }
         else if (e.getSource() == buttonResize | e.getSource() == toolsResize) {
             try {
+                opCount++;
                 // resize popup
                 JTextField width = new JTextField(5);
                 JTextField height = new JTextField(5);
@@ -390,7 +396,7 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
                 IMOperation op = new IMOperation();
                 op.addImage(imagePath);
                 op.resize(Integer.parseInt(width.getText()), Integer.parseInt(height.getText()));
-                newImage = imagePath.replace(".jpg", "_resize.jpg");
+                newImage = imagePath.replace(".jpg", "_"+opCount+".jpg");
                 op.addImage(newImage);
                 // execute the operation
                 cmd.run(op);
@@ -416,13 +422,14 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
             }
         }
         else if (e.getSource() == buttonMonochrome | e.getSource() == toolsMonochrome) {
+            opCount++;
             // ImageMagick Call
             ConvertCmd cmd = new ConvertCmd();
             // create the operation, add images and operators/options
             IMOperation op = new IMOperation();
             op.addImage(imagePath);
             op.monochrome();
-            newImage = imagePath.replace(".jpg", "_monochrome.jpg");
+            newImage = imagePath.replace(".jpg", "_"+opCount+".jpg");
             op.addImage(newImage);
             // execute the operation
             try {
@@ -449,13 +456,14 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
             buttonLastImage.setEnabled(true);
         }
         else if (e.getSource() == buttonInvert | e.getSource() == toolsInvert) {
+            opCount++;
             // ImageMagick Call
             ConvertCmd cmd = new ConvertCmd();
             // create the operation, add images and operators/options
             IMOperation op = new IMOperation();
             op.addImage(imagePath);
             op.negate();
-            newImage = imagePath.replace(".jpg", "_negate.jpg");
+            newImage = imagePath.replace(".jpg", "_"+opCount+".jpg");
             historyList.add("invert/negate");
             op.addImage(newImage);
             // execute the operation
@@ -482,6 +490,7 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
             buttonLastImage.setEnabled(true);
         }
         else if (e.getSource() == buttonSC | e.getSource() == toolsSC) {
+            opCount++;
             JTextField cc = new JTextField(5);
             JTextField cf = new JTextField(5);
             JPanel CSPanel = new JPanel();
@@ -498,7 +507,7 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
             IMOperation op = new IMOperation();
             op.addImage(imagePath);
             op.sigmoidalContrast(Double.parseDouble(cc.getText()), Double.parseDouble(cf.getText()));
-            newImage = imagePath.replace(".jpg", "_contrastStretch.jpg");
+            newImage = imagePath.replace(".jpg", "_"+opCount+".jpg");
             historyList.add("sigmoidal contrast: center= " + cc.getText() + " factor= " + cf.getText());
             op.addImage(newImage);
             // execute the operation
@@ -526,7 +535,7 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
         }
         else if (e.getSource() == exportHistory) {
             JFileChooser fileChooser = new JFileChooser();
-            fileChooser.setDialogTitle("Specify a file to save");
+            fileChooser.setDialogTitle("Specify a (.txt)file to save");
             int userSelection = fileChooser.showSaveDialog(null);
             if (userSelection == JFileChooser.APPROVE_OPTION) {
                 PrintWriter output;
@@ -543,6 +552,7 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
             }
         }
         else if (e.getSource() == buttonLastImage) {
+            opCount--;
             imagePath = lastImage;
             File imgFile = new File(imagePath);
             BufferedImage img;
