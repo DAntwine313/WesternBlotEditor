@@ -6,9 +6,6 @@ import java.io.*;
 import java.util.*;
 import java.util.List;
 import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.*;
 import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -44,6 +41,7 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
     private int opCount = 0;
     List<String> historyList = new ArrayList<>(
             List.of());
+    private String extension;
     public UMGCWesternBlotEditor() throws IOException {
         super("UMGC Western Blot Editor");
         // Create Graphical Interface
@@ -139,7 +137,7 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
         // Load Initial Image ** FIND A BETTER WAY TO DO THIS!! ***
         JFileChooser chooser = new JFileChooser();
         FileNameExtensionFilter filter = new FileNameExtensionFilter(
-                "JPG, GIF, PNG Images", "jpg", "gif", "png");
+                "JPG, TIFF, PNG, HEIC Images", "jpg", "tiff", "png", "heic");
         chooser.setFileFilter(filter);
         JTextField textFieldImagePath = new JTextField(100);
         int returnVal = chooser.showOpenDialog(null);
@@ -147,6 +145,14 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
             textFieldImagePath.setText(chooser.getSelectedFile().getAbsolutePath());
         }
         imagePath = textFieldImagePath.getText();
+        if(imagePath.contains(".jpg"))
+            extension = ".jpg";
+        else if(imagePath.contains(".tiff"))
+            extension = ".tiff";
+        else if (imagePath.contains(".png"))
+            extension = ".png";
+        else if (imagePath.contains(".heic"))
+            extension = ".heic";
         originalImage = imagePath;
         File imgFile = new File(textFieldImagePath.getText());
         BufferedImage img = ImageIO.read(imgFile);
@@ -155,8 +161,7 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
         imageScrollPane = new JScrollPane(image);
         buttonLastImage.setEnabled(false);
 
-
-        // Add to GUI
+        // Load Content Pane and add components
         l_c = getContentPane();
         l_c.setLayout(new BorderLayout());
         l_c.add(menuBar, BorderLayout.NORTH);
@@ -171,13 +176,13 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
         UMGCWesternBlotEditor t = new UMGCWesternBlotEditor();
         t.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
-    // JSlider optionPane For Brightness Contrast
+    // action listeners
     public void actionPerformed(ActionEvent e) {
         String newImage;
         if (e.getSource() == fileOpen) {
             JFileChooser chooser = new JFileChooser();
             FileNameExtensionFilter filter = new FileNameExtensionFilter(
-                    "JPG, GIF, PNG Images", "jpg", "gif", "png");
+                    "JPG, TIFF, PNG, HEIC Images", "jpg", "tiff", "png", "heic");
             chooser.setFileFilter(filter);
             JTextField textFieldImagePath = new JTextField(100);
             int returnVal = chooser.showOpenDialog(null);
@@ -185,6 +190,14 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
                 textFieldImagePath.setText(chooser.getSelectedFile().getAbsolutePath());
             }
             imagePath = textFieldImagePath.getText();
+            if(imagePath.contains(".jpg"))
+                extension = ".jpg";
+            else if(imagePath.contains(".tiff"))
+                extension = ".tiff";
+            else if (imagePath.contains(".png"))
+                extension = ".png";
+            else if (imagePath.contains(".heic"))
+                extension = ".heic";
             // Set original path to use with reset
             originalImage = imagePath;
             File imgFile = new File(imagePath);
@@ -206,7 +219,7 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
         else if (e.getSource() == fileSaveAs) {
             JFileChooser fileChooser = new JFileChooser();
             FileNameExtensionFilter filter = new FileNameExtensionFilter(
-                    "JPG, GIF, PNG, TIFF Images", "jpg", "gif", "png", "tiff");
+                    "JPG, TIFF, PNG, HEIC Images", "jpg", "tiff", "png", "heic");
             fileChooser.setFileFilter(filter);
             fileChooser.setDialogTitle("Specify a file to save");
             int userSelection = fileChooser.showSaveDialog(null);
@@ -277,7 +290,7 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
             IMOperation op = new IMOperation();
             op.addImage(imagePath);
             op.edge(Double.parseDouble(thickness.getText()));
-            newImage = imagePath.replace(".jpg", "_"+opCount+".jpg");
+            newImage = imagePath.replace(extension, "_"+opCount+extension);
             op.addImage(newImage);
             // execute the operation
             try {
@@ -349,7 +362,7 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
             op.addImage(imagePath);
             op.brightnessContrast((double) sliderB.getValue(), (double) sliderC.getValue());
             // Label new image with update
-            newImage = imagePath.replace(".jpg", "_"+opCount+".jpg");
+            newImage = imagePath.replace(extension, "_"+opCount+extension);
             // ImageMagick write newImage
             op.addImage(newImage);
             historyList.add("brightness: " + sliderB.getValue() + " contrast: " + sliderC.getValue());
@@ -396,7 +409,7 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
                 IMOperation op = new IMOperation();
                 op.addImage(imagePath);
                 op.resize(Integer.parseInt(width.getText()), Integer.parseInt(height.getText()));
-                newImage = imagePath.replace(".jpg", "_"+opCount+".jpg");
+                newImage = imagePath.replace(extension, "_"+opCount+extension);
                 op.addImage(newImage);
                 // execute the operation
                 cmd.run(op);
@@ -429,7 +442,7 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
             IMOperation op = new IMOperation();
             op.addImage(imagePath);
             op.monochrome();
-            newImage = imagePath.replace(".jpg", "_"+opCount+".jpg");
+            newImage = imagePath.replace(extension, "_"+opCount+extension);
             op.addImage(newImage);
             // execute the operation
             try {
@@ -463,7 +476,7 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
             IMOperation op = new IMOperation();
             op.addImage(imagePath);
             op.negate();
-            newImage = imagePath.replace(".jpg", "_"+opCount+".jpg");
+            newImage = imagePath.replace(extension, "_"+opCount+extension);
             historyList.add("invert/negate");
             op.addImage(newImage);
             // execute the operation
@@ -507,7 +520,7 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
             IMOperation op = new IMOperation();
             op.addImage(imagePath);
             op.sigmoidalContrast(Double.parseDouble(cc.getText()), Double.parseDouble(cf.getText()));
-            newImage = imagePath.replace(".jpg", "_"+opCount+".jpg");
+            newImage = imagePath.replace(extension, "_"+opCount+extension);
             historyList.add("sigmoidal contrast: center= " + cc.getText() + " factor= " + cf.getText());
             op.addImage(newImage);
             // execute the operation
