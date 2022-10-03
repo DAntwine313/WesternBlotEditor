@@ -97,8 +97,14 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
         file.add(fileOpen);
         fileOpen.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_MASK ));
 
+        // quick key strokes -- Save As
         file.add(fileSaveAs);
+        fileSaveAs.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.CTRL_MASK));
+
+        // quick key strokes -- Reset Image
         edit.add(editReset);
+        editReset.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.CTRL_MASK));
+
         tools.add(new JLabel("Detect Lines"));
         tools.add(toolsEdge);
         tools.add(new JSeparator());
