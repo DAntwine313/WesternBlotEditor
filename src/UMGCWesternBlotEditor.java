@@ -1,6 +1,8 @@
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.*;
@@ -91,7 +93,10 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
         JMenu tools = new JMenu("Tools");
         JMenu history = new JMenu("History");
         history.add(historyShowHistory);
+        // quick key strokes -- open
         file.add(fileOpen);
+        fileOpen.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_MASK ));
+
         file.add(fileSaveAs);
         edit.add(editReset);
         tools.add(new JLabel("Detect Lines"));
