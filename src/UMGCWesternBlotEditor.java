@@ -89,10 +89,23 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
         exportHistory.addActionListener(this);
             // Create Menu and Add Menu Items
         JMenu file = new JMenu("File");
+        file.setMnemonic('F'); // Alt -F will access files
+
+
         JMenu edit = new JMenu("Edit");
+        edit.setMnemonic('E'); // Alt -E will access Edits
+
         JMenu tools = new JMenu("Tools");
+        tools.setMnemonic('T'); // Alt -T will access Tools
+
         JMenu history = new JMenu("History");
+        history.setMnemonic('H'); // Alt -H will access History
         history.add(historyShowHistory);
+
+        // will need a help button not shown on menu bar just yet-- need to finalize program//
+        JMenu help = new JMenu("Help");
+        help.setMnemonic('P'); // Alt -P will access Help
+
         // quick key strokes -- open
         file.add(fileOpen);
         fileOpen.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_MASK ));
