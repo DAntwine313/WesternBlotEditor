@@ -173,8 +173,8 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
         setVisible(true);
     }
     public static void main(String[] args) throws IOException {
-        UMGCWesternBlotEditor t = new UMGCWesternBlotEditor();
-        t.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        UMGCWesternBlotEditor d = new UMGCWesternBlotEditor();
+        d.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
     // action listeners
     public void actionPerformed(ActionEvent e) {
@@ -292,13 +292,14 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
             op.edge(Double.parseDouble(thickness.getText()));
             newImage = imagePath.replace(extension, "_"+opCount+extension);
             op.addImage(newImage);
+            historyList.add("edge: " + thickness.getText());
+            op.caption(historyList.toString());
             // execute the operation
             try {
                 cmd.run(op);
             } catch (IOException | InterruptedException | IM4JavaException ex) {
                 throw new RuntimeException(ex);
             }
-            historyList.add("edge: " + thickness.getText());
             lastImage = imagePath;
             imagePath = newImage;
             File imgFile = new File(imagePath);
@@ -366,6 +367,7 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
             // ImageMagick write newImage
             op.addImage(newImage);
             historyList.add("brightness: " + sliderB.getValue() + " contrast: " + sliderC.getValue());
+            op.caption(historyList.toString());
             try {
                 cmd.run(op);
             } catch (IOException | IM4JavaException | InterruptedException ex) {
@@ -410,10 +412,11 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
                 op.addImage(imagePath);
                 op.resize(Integer.parseInt(width.getText()), Integer.parseInt(height.getText()));
                 newImage = imagePath.replace(extension, "_"+opCount+extension);
+                historyList.add("resize: " + Integer.parseInt(width.getText()) + "x" + Integer.parseInt(height.getText()));
+                op.caption(historyList.toString());
                 op.addImage(newImage);
                 // execute the operation
                 cmd.run(op);
-                historyList.add("resize: " + Integer.parseInt(width.getText()) + "x" + Integer.parseInt(height.getText()));
                 lastImage = imagePath;
                 imagePath = newImage;
                 File imgFile = new File(imagePath);
@@ -443,6 +446,8 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
             op.addImage(imagePath);
             op.monochrome();
             newImage = imagePath.replace(extension, "_"+opCount+extension);
+            historyList.add("monochrome");
+            op.caption(historyList.toString());
             op.addImage(newImage);
             // execute the operation
             try {
@@ -450,7 +455,6 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
             } catch (IOException | InterruptedException | IM4JavaException ex) {
                 throw new RuntimeException(ex);
             }
-            historyList.add("monochrome");
             lastImage = imagePath;
             imagePath = newImage;
             File imgFile = new File(imagePath);
@@ -478,6 +482,7 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
             op.negate();
             newImage = imagePath.replace(extension, "_"+opCount+extension);
             historyList.add("invert/negate");
+            op.caption(historyList.toString());
             op.addImage(newImage);
             // execute the operation
             try {
@@ -522,6 +527,7 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
             op.sigmoidalContrast(Double.parseDouble(cc.getText()), Double.parseDouble(cf.getText()));
             newImage = imagePath.replace(extension, "_"+opCount+extension);
             historyList.add("sigmoidal contrast: center= " + cc.getText() + " factor= " + cf.getText());
+            op.caption(historyList.toString());
             op.addImage(newImage);
             // execute the operation
             try {
