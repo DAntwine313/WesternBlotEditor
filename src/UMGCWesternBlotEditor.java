@@ -204,6 +204,7 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
     public void actionPerformed(ActionEvent e) {
         String newImage;
         if (e.getSource() == fileOpen) {
+            opCount = 0;
             JFileChooser chooser = new JFileChooser();
             FileNameExtensionFilter filter = new FileNameExtensionFilter(
                     "JPG, TIFF, PNG, HEIC Images", "jpg", "tiff", "png", "heic");
