@@ -50,21 +50,29 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
           // Buttons and Listeners
         buttonResize = new JButton("Resize");
         buttonResize.addActionListener(this);
+
         buttonInvert = new JButton("Invert");
         buttonInvert.addActionListener(this);
+
         buttonEdge = new JButton("Edge");
         buttonEdge.addActionListener(this);
+
         buttonMonochrome = new JButton("Monochrome");
         buttonMonochrome.addActionListener(this);
+
         buttonBrightnessContrast = new JButton("Bright/Contrast");
         buttonBrightnessContrast.addActionListener(this);
+
         buttonSC = new JButton("Sigmoidal Contrast");
         buttonSC.addActionListener(this);
+
         buttonReset = new JButton("Reset");
         buttonReset.addActionListener(this);
+
         buttonLastImage = new JButton("Get Last Image");
         buttonLastImage.addActionListener(this);
-            // Create menu items
+
+        /* ********************************************** Create menu items **********************************************/
         fileOpen = new JMenuItem("Open");
         fileOpen.addActionListener(this);
         fileSaveAs = new JMenuItem("Save As");
@@ -87,13 +95,30 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
         historyShowHistory.addActionListener(this);
         exportHistory = new JButton("Export History");
         exportHistory.addActionListener(this);
-            // Create Menu and Add Menu Items
+
+
+ /* ********************************************** Create Menu and Add Menu Items **********************************************/
+
+
+                            ///FILE MENU
         JMenu file = new JMenu("File");
         file.setMnemonic('F'); // Alt -F will access files
+                       //BUTTONS UNDER FILE MENU//
+         //quick keystrokes -> Open = Ctrl-O
+        file.add(fileOpen);
+        fileOpen.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_MASK ));
 
+        // quick key strokes ->  Save As = Ctrl-A
+        file.add(fileSaveAs);
+        fileSaveAs.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.CTRL_MASK));
 
+                                ///EDIT MENU
         JMenu edit = new JMenu("Edit");
         edit.setMnemonic('E'); // Alt -E will access Edits
+                    //BUTTONS UNDER EDIT MENU
+         //quick keystrokes -> Reset Image = Ctrl- R
+        edit.add(editReset);
+        editReset.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_MASK));
 
         JMenu tools = new JMenu("Tools");
         tools.setMnemonic('T'); // Alt -T will access Tools
@@ -106,17 +131,8 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
         JMenu help = new JMenu("Help");
         help.setMnemonic('P'); // Alt -P will access Help
 
-        // quick key strokes -- open
-        file.add(fileOpen);
-        fileOpen.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_MASK ));
 
-        // quick key strokes -- Save As
-        file.add(fileSaveAs);
-        fileSaveAs.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.CTRL_MASK));
 
-        // quick key strokes -- Reset Image
-        edit.add(editReset);
-        editReset.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.CTRL_MASK));
 
         tools.add(new JLabel("Detect Lines"));
         tools.add(toolsEdge);
@@ -199,6 +215,11 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
     public static void main(String[] args) throws IOException {
         UMGCWesternBlotEditor t = new UMGCWesternBlotEditor();
         t.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+
+
+
+
     }
     // action listeners
     public void actionPerformed(ActionEvent e) {
