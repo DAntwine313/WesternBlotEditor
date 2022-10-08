@@ -205,7 +205,7 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener {
         // create process
         ProcessBuilder pb = new ProcessBuilder();
         // location of shell script to be executed
-        pb.directory(new File("/Users/pfspooter/Desktop/Shell_Test/pb_test/"));
+        pb.directory(new File("bash_script"));
         // commands to be run, first invoke the program to run, then the commands to be executed with any arguments
 
         /* can also build a list of commands
@@ -215,7 +215,7 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener {
         commands.add("-l"); // command
         */
 
-        pb.command("bash", "copy.sh");
+        pb.command("bash", "bash_output.sh");
         // start process
         try {
             Process process = pb.start();
@@ -630,10 +630,6 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener {
             historyList.remove(lastItemIndex);
             buttonLastImage.setEnabled(false);
         }
-
-
-        // this is the file path for the user's chosen image
-        //originalImage
 
         // each time
         // variables for running the script
