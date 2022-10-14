@@ -1,7 +1,17 @@
-#!/bin/bash
+
 
 #Removes any temporary files
-rm test_* filenames.txt testdata_final.mvg test1.txt test2.txt pleasework2.sh pleasework.txt verbosdata.txt output.txt houghexec.sh
+rm test*
+rm filenames*
+rm pleasework*
+rm verbosdata*
+rm output*
+rm houghexec*
+
+
+#makes sure bands are white and the background is black.
+
+magick "$VAR1" -channel RGB -negate badbandstest.png
 
 #Canny edge detection algorithm
 #Need to provide the user with different options regarding the xsigma+x%+y% so to accomadate gels of different sizes
@@ -12,32 +22,32 @@ magick badbandstest.png \
 	-connected-components 8 -auto-level -depth 8 verboseimage.png > testdata2.txt
 
 #Removes the first line of the verbosedata and then appends the area and position to respective files
-awk '{print $2}' testdata2.txt| awk "NR>2" > verbosedata.txt 
+awk '{print $2}' testdata2.txt | awk "NR>2" > verbosedata.txt
 grep -Eo "[0-9]+x[0-9]+" verbosedata.txt > verbosedata_geometry.txt
 grep -Eo "\+[0-9]+\+[0-9]+" verbosedata.txt > verbosedata_resize.txt
 
 #Extracts bands detected with the canny edge detection algorithm
 n=0;
-touch testdata_final.mvg
-while read line;do
-	n=$(($n+1))
-	filename=`echo test_"$n"`
-	filepng=`echo "$filename".png`
-	bounding_box=`echo "$line"`
 
-	magick -size 518x136 -depth 8 -extract $bounding_box \
-		badbandstest.png $filepng
+while read -r line;do
+	n=$((n+1))
+	filename=$(echo test_"$n")
+	filepng=$(echo "$filename".png)
+	bounding_box=$(echo "$line")
+
+	magick -size 518x136 -depth 8 -extract "$bounding_box" \
+		badbandstest.png "$filepng"
 	echo "\(" "$filepng" >> filenames.txt
 done < verbosedata.txt
 
 #creates a file containing the hough-line algorithm
 n=0;
-while read line;do
-	n=$(($n+1))
-	filename=`echo test_"$n"`
-	filepng=`echo "$filename".png`
+while read -r line;do
+	n=$((n+1))
+	filename=$(echo test_"$n")
+	filepng=$(echo "$filename".png)
 	echo "magick" "$filepng" "\\( +clone -background none -fill red -strokewidth 1 -hough-lines" "$line""+30 -write" "$filename""_line.png \\) -composite" "$filename""_hough.png" >> houghexec.sh
-	echo "magick" "$filename""_hough.png -hough-lines" "$line""+30" "$filename""_hough.mvg" >> houghexec.sh 
+	echo "magick" "$filename""_hough.png -hough-lines" "$line""+30" "$filename""_hough.mvg" >> houghexec.sh
 	echo "cat" "$filename""_hough.mvg >> output.txt" >> houghexec.sh
 done < verbosedata_geometry.txt
 
@@ -49,17 +59,20 @@ chmod +x houghexec.sh
 #Build the reconstruction algorithm
 
 #Extracts the contents of verbose_geometry.txt and verbose_resize.txt while incorpoating the contents into the algorithm
-for a in $(cat verbosedata_geometry.txt);do
-    echo "-resize" "$a" "\) -geometry" >> test1.txt 
-done
+while read -r a;do
+    echo "-resize" "$a" "\) -geometry" >> test1.txt
+done < verbosedata_geometry.txt
 
-for b in $(cat verbosedata_resize.txt);do   
+while read -r b;do
 	echo "$b" "-composite" "\\" >> test2.txt
-done
+done < verbosedata_resize.txt
 
 #merges the files together, makes the file executable, and run the executable
 paste filenames.txt test1.txt test2.txt > pleasework.txt
-sed '1 s/^/magick -size 518x136 xc:black \\\n/' pleasework.txt > pleasework2.sh 
-echo "composite.png" >> pleasework2.sh 
+sed '1 s/^/magick -size 518x136 xc:black \\\n/' pleasework.txt > pleasework2.sh
+echo "composite.png" >> pleasework2.sh
 chmod +x pleasework2.sh
 ./pleasework2.sh
+
+#removes temporary files
+rm test_*
