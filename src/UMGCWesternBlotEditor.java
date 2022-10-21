@@ -34,6 +34,7 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
     private final JMenuItem toolsResize;
     private final JMenuItem toolsMonochrome;
     private final JMenuItem toolsInvert;
+    private final JMenuItem scriptEdge;
     private final JMenuItem historyShowHistory;
     private JScrollPane imageScrollPane;
     private final Container l_c;
@@ -47,7 +48,7 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
     public UMGCWesternBlotEditor() throws IOException {
         super("UMGC Western Blot Editor");
         // Create Graphical Interface
-          // Buttons and Listeners
+        // Buttons and Listeners
         buttonResize = new JButton("Resize");
         buttonResize.addActionListener(this);
 
@@ -91,20 +92,22 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
         toolsMonochrome.addActionListener(this);
         toolsInvert = new JMenuItem("Invert");
         toolsInvert.addActionListener(this);
+        scriptEdge = new JMenuItem("Edge Detection Bash Script");
+        scriptEdge.addActionListener(this);
         historyShowHistory = new JMenuItem("Show History");
         historyShowHistory.addActionListener(this);
         exportHistory = new JButton("Export History");
         exportHistory.addActionListener(this);
 
 
- /* ********************************************** Create Menu and Add Menu Items **********************************************/
+        /* ********************************************** Create Menu and Add Menu Items **********************************************/
 
 
-                            ///FILE MENU
+        ///FILE MENU
         JMenu file = new JMenu("File");
         file.setMnemonic('F'); // Alt -F will access files
-                       //BUTTONS UNDER FILE MENU//
-         //quick keystrokes -> Open = Ctrl-O
+        //BUTTONS UNDER FILE MENU//
+        //quick keystrokes -> Open = Ctrl-O
         file.add(fileOpen);
         fileOpen.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_MASK ));
 
@@ -112,16 +115,19 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
         file.add(fileSaveAs);
         fileSaveAs.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.CTRL_MASK));
 
-                                ///EDIT MENU
+        ///EDIT MENU
         JMenu edit = new JMenu("Edit");
         edit.setMnemonic('E'); // Alt -E will access Edits
-                    //BUTTONS UNDER EDIT MENU
-         //quick keystrokes -> Reset Image = Ctrl- R
+        //BUTTONS UNDER EDIT MENU
+        //quick keystrokes -> Reset Image = Ctrl- R
         edit.add(editReset);
         editReset.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_MASK));
 
         JMenu tools = new JMenu("Tools");
         tools.setMnemonic('T'); // Alt -T will access Tools
+
+        JMenu script = new JMenu("Script");
+        script.setMnemonic('S');
 
         JMenu history = new JMenu("History");
         history.setMnemonic('H'); // Alt -H will access History
@@ -145,17 +151,20 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
         tools.add(toolsSC);
         tools.add(toolsMonochrome);
         tools.add(toolsInvert);
-            // Create Menu Bar
+        script.add(new JLabel("OS/Linux Users"));
+        script.add(scriptEdge);
+        // Create Menu Bar
         JMenuBar mb = new JMenuBar();
         mb.add(file);
         mb.add(edit);
         mb.add(tools);
         mb.add(history);
-            // Add Top Menu Bar
+        mb.add(script);
+        // Add Top Menu Bar
         JPanel menuBar = new JPanel();
         menuBar.setLayout(new BorderLayout());
         menuBar.add(mb);
-            // Add Buttons
+        // Add Buttons
         JPanel panelButtonDL = new JPanel();
         panelButtonDL.add(new JLabel("Detect Lines"));
         panelButtonDL.add(new JSeparator());
@@ -338,13 +347,47 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
             op.edge(Double.parseDouble(thickness.getText()));
             newImage = imagePath.replace(extension, "_"+opCount+extension);
             op.addImage(newImage);
+            historyList.add("edge: " + thickness.getText());
             // execute the operation
             try {
                 cmd.run(op);
             } catch (IOException | InterruptedException | IM4JavaException ex) {
                 throw new RuntimeException(ex);
             }
-            historyList.add("edge: " + thickness.getText());
+            lastImage = imagePath;
+            imagePath = newImage;
+            File imgFile = new File(imagePath);
+            BufferedImage img;
+            try {
+                img = ImageIO.read(imgFile);
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+            ImageIcon icon = new ImageIcon(img);
+            JLabel image = new JLabel(icon);
+            l_c.remove(imageScrollPane);
+            imageScrollPane = new JScrollPane(image);
+            l_c.add(imageScrollPane);
+            l_c.revalidate();
+            buttonLastImage.setEnabled(true);
+        }
+        else if (e.getSource() == scriptEdge) {
+            opCount++;
+            JTextField thickness = new JTextField();
+            JPanel edgePanel = new JPanel();
+
+            try {
+                ProcessBuilder pb = new ProcessBuilder("./band_detection_real.sh");
+                Map<String, String> env = pb.environment();
+                env.put("VAR1", imagePath);
+                Process p = pb.start();
+                p.waitFor();
+                System.out.println("Script executed successfully");
+            } catch (IOException | InterruptedException ex) {
+                throw new RuntimeException(ex);
+            }
+
+            newImage = "composite.png";
             lastImage = imagePath;
             imagePath = newImage;
             File imgFile = new File(imagePath);
@@ -365,7 +408,7 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
         else if (e.getSource() == buttonBrightnessContrast | e.getSource() == toolsBC) {
             opCount++;
             // Pop up window for brightness contrast params
-                //Change the JTextfield for brightness/contrast so that user can use slider to adjust value or type in the value.
+            //Change the JTextfield for brightness/contrast so that user can use slider to adjust value or type in the value.
             JPanel bcPanel = new JPanel();
             bcPanel.setLayout(new GridLayout(2, 1));
             JOptionPane optionBPane = new JOptionPane();
