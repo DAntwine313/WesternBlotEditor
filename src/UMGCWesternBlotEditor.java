@@ -514,9 +514,10 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
             try {
                 ProcessBuilder pb = new ProcessBuilder("./bash_scripts/brightness_contrast.sh");
                 Map<String, String> env = pb.environment();
-                env.put("VAR1", this.imagePath);
+                env.put("VAR1", this.lastImage);
                 env.put("VAR2", String.valueOf(sliderB.getValue()));
                 env.put("VAR3", String.valueOf(sliderC.getValue()));
+                env.put("VAR4", this.imagePath);
                 Process p = pb.start();
                 p.waitFor();
                 System.out.println("Script executed successfully");
@@ -577,9 +578,11 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
                 try {
                     ProcessBuilder pb = new ProcessBuilder("bash_scripts/resize.sh");
                     Map<String, String> env = pb.environment();
-                    env.put("VAR1", this.imagePath);
+                    env.put("VAR1", this.lastImage);
                     env.put("VAR2", String.valueOf(width.getText()));
                     env.put("VAR3", String.valueOf(height.getText()));
+                    env.put("VAR4", this.imagePath);
+
                     Process p = pb.start();
                     p.waitFor();
                     System.out.println("Script executed successfully");
@@ -634,7 +637,9 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
             try {
                 ProcessBuilder pb = new ProcessBuilder("./bash_scripts/monochrome.sh");
                 Map<String, String> env = pb.environment();
-                env.put("VAR1", this.imagePath);
+                env.put("VAR1", this.lastImage);
+                env.put("VAR2", this.imagePath);
+
                 Process p = pb.start();
                 p.waitFor();
                 System.out.println("Script executed successfully");
@@ -687,7 +692,8 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
             try {
                 ProcessBuilder pb = new ProcessBuilder("./bash_scripts/invert.sh");
                 Map<String, String>env = pb.environment();
-                env.put("VAR1", this.imagePath);
+                env.put("VAR1", this.lastImage);
+                env.put("VAR2", this.imagePath);
                 Process p = pb.start();
                 p.waitFor();
                 System.out.println("Script executed successfully");
@@ -749,9 +755,11 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
             try {
                 ProcessBuilder pb = new ProcessBuilder("./bash_scripts/sigmoidal.sh");
                 Map<String, String> env = pb.environment();
-                env.put("VAR1", this.imagePath);
+                env.put("VAR1", this.lastImage);
                 env.put("VAR2", String.valueOf(cc.getText()));
                 env.put("VAR3", String.valueOf(cf.getText()));
+                env.put("VAR4", this.imagePath);
+
                 Process p = pb.start();
                 p.waitFor();
                 System.out.println("Script executed successfully");

@@ -1,6 +1,7 @@
 # Monochrome
 # define variables
-# VAR1 = file path
+# VAR1 = input file path
+# VAR2 = output file path
 
-convert "$VAR1" -monochrome "$VAR1"
-printf "\nconvert %s -monochrome %s" "$VAR1" "$VAR1" >> output.sh
+convert "$VAR1" -monochrome "$VAR2"
+printf "\nconvert %s -monochrome %s" "$VAR1" "$VAR2" >> output.sh
