@@ -382,6 +382,7 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
             buttonLastImage.setEnabled(true);
         }
 
+
         else if (e.getSource() == buttonScriptEdge | e.getSource() == scriptEdge) {
             opCount++;
             JTextField Radius = new JTextField();
@@ -414,14 +415,16 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
             } catch (IOException | InterruptedException ex) {
                 throw new RuntimeException(ex);
             }
+
             Path pathtoFolder = Path.of(imageDirectory);
             Path pathtoFile = pathtoFolder.resolve("composite.png");
-           // newImage = "composite.png";
+
             lastImage = imagePath;
             imagePath = String.valueOf(pathtoFile);
-           // System.out.println(String.valueOf(Radius.getText()));
+
             File imgFile = new File(imagePath);
             BufferedImage img;
+            System.out.println(imgFile);
             try {
                 img = ImageIO.read(imgFile);
             } catch (IOException ex) {
@@ -681,7 +684,7 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
 
             // Process builder calls bash script
             try {
-                ProcessBuilder pb = new ProcessBuilder("./basch_scripts/invert.sh");
+                ProcessBuilder pb = new ProcessBuilder("./bash_scripts/invert.sh");
                 Map<String, String>env = pb.environment();
                 env.put("VAR1", this.imagePath);
                 Process p = pb.start();
@@ -801,7 +804,7 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
 
             // Process builder calls bash script
             try {
-                ProcessBuilder pb = new ProcessBuilder("./remove_last.sh");
+                ProcessBuilder pb = new ProcessBuilder("./bash_scripts/remove_last.sh");
                 Process p = pb.start();
                 p.waitFor();
                 System.out.println("Script executed successfully");
