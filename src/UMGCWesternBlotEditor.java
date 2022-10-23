@@ -412,6 +412,7 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
                 Process p = pb.start();
                 p.waitFor();
                 System.out.println("Script executed successfully");
+                historyList.add("Edge Script(OS/Linux): radius: " + Radius.getText() + " lower limit: " + LowerLimit.getText() + " upper limit: " + UpperLimit.getText());
             } catch (IOException | InterruptedException ex) {
                 throw new RuntimeException(ex);
             }
