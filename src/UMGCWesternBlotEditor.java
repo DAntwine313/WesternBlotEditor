@@ -121,6 +121,18 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
         // quick key strokes ->  Save As = Ctrl-A
         file.add(fileSaveAs);
         fileSaveAs.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.CTRL_MASK));
+// exit button
+
+        JMenuItem exitbutton = new JMenuItem("Exit");
+        exitbutton.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.CTRL_DOWN_MASK));
+        exitbutton.setForeground(Color.RED);
+        file.add(exitbutton);
+        exitbutton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.exit(EXIT_ON_CLOSE);
+            }
+        });
 
         ///EDIT MENU
         JMenu edit = new JMenu("Edit");
