@@ -5,7 +5,6 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.nio.file.Path;
 import java.util.*;
 import java.util.List;
 import javax.imageio.ImageIO;
@@ -19,7 +18,6 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
 {
     private final JButton buttonResize;
     private final JButton buttonEdge;
-    private final JButton buttonScriptEdge;
     private final JButton buttonMonochrome;
     private final JButton buttonInvert;
     private final JButton buttonBrightnessContrast;
@@ -41,8 +39,6 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
     private JScrollPane imageScrollPane;
     private final Container l_c;
     private String imagePath;
-    private String imageDirectory;
-    private String imageName;
     private String originalImage;
     private String lastImage;
     private int opCount = 0;
@@ -53,6 +49,9 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
         super("UMGC Western Blot Editor");
         // Create Graphical Interface
         // Buttons and Listeners
+
+
+
         buttonResize = new JButton("Resize");
         buttonResize.addActionListener(this);
 
@@ -61,9 +60,6 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
 
         buttonEdge = new JButton("Edge");
         buttonEdge.addActionListener(this);
-
-        buttonScriptEdge = new JButton("Edge");
-        buttonScriptEdge.addActionListener(this);
 
         buttonMonochrome = new JButton("Monochrome");
         buttonMonochrome.addActionListener(this);
@@ -85,7 +81,17 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
         fileOpen.addActionListener(this);
         fileSaveAs = new JMenuItem("Save As");
         fileSaveAs.addActionListener(this);
-        editReset = new JMenuItem("Reset");
+        
+        JMenuItem fileExit = new JMenuItem("Exit");
+        fileExit.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.exit(EXIT_ON_CLOSE);
+            }
+        });
+
+
+                editReset = new JMenuItem("Reset");
         editReset.addActionListener(this);
         toolsEdge = new JMenuItem("Edge");
         toolsEdge.addActionListener(this);
@@ -106,6 +112,10 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
         exportHistory = new JButton("Export History");
         exportHistory.addActionListener(this);
 
+        //trying grayscale
+        JMenuItem toolsgrayscale = new JMenuItem("GRAYSCALE");
+        toolsgrayscale.addActionListener(this::actionPerformed);
+
 
         /* ********************************************** Create Menu and Add Menu Items **********************************************/
 
@@ -122,6 +132,14 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
         file.add(fileSaveAs);
         fileSaveAs.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.CTRL_MASK));
 
+
+        // exit button -->Ctrl -E
+        file.add(fileExit);
+        fileExit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.CTRL_DOWN_MASK));
+        fileExit.setForeground(Color.RED);
+
+
+
         ///EDIT MENU
         JMenu edit = new JMenu("Edit");
         edit.setMnemonic('E'); // Alt -E will access Edits
@@ -133,6 +151,9 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
         JMenu tools = new JMenu("Tools");
         tools.setMnemonic('T'); // Alt -T will access Tools
 
+        JMenu script = new JMenu("Script");
+        script.setMnemonic('S');
+
         JMenu history = new JMenu("History");
         history.setMnemonic('H'); // Alt -H will access History
         history.add(historyShowHistory);
@@ -141,44 +162,66 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
         JMenu help = new JMenu("Help");
         help.setMnemonic('P'); // Alt -P will access Help
 
+//detect lines menu
+        JMenu DetectLinesMenu = new JMenu("Detect Lines");
+        tools.add(DetectLinesMenu);
+        DetectLinesMenu.add(toolsEdge);
 
-
-
-        tools.add(new JLabel("Detect Lines"));
-        tools.add(toolsEdge);
-        tools.add(new JLabel("Detect edge and Straighten bands (Unix/Linux)"));
-        tools.add(scriptEdge);
         tools.add(new JSeparator());
-        tools.add(new JLabel("Transform"));
-        tools.add(toolsResize);
+//transform menu
+        JMenu transformMenu = new JMenu("Transform");
+        tools.add(transformMenu);
+        transformMenu.add(toolsResize);
+
         tools.add(new JSeparator());
-        tools.add(new JLabel("Image Color"));
-        tools.add(toolsBC);
-        tools.add(toolsSC);
-        tools.add(toolsMonochrome);
-        tools.add(toolsInvert);
+//image color menu
+        JMenu imagecolormenu = new JMenu("Image Color");
+        tools.add(imagecolormenu);
+        imagecolormenu.add(toolsBC);
+
+        JSeparator separator_4 = new JSeparator();
+        imagecolormenu.add(separator_4);
+        imagecolormenu.add(toolsSC);
+
+        JSeparator separator_3 = new JSeparator();
+        imagecolormenu.add(separator_3);
+
+        imagecolormenu.add(toolsMonochrome);
+        JSeparator separator_2 = new JSeparator();
+
+        imagecolormenu.add(separator_2);
+        imagecolormenu.add(toolsInvert);
+
+        //script menu
+        JMenu scriptmenu = new JMenu("OS/Linux Users");
+        script.add(scriptmenu);
+         scriptmenu.add(scriptEdge);
+
+
         // Create Menu Bar
         JMenuBar mb = new JMenuBar();
         mb.add(file);
         mb.add(edit);
         mb.add(tools);
         mb.add(history);
+        mb.add(script);
         // Add Top Menu Bar
         JPanel menuBar = new JPanel();
         menuBar.setLayout(new BorderLayout());
         menuBar.add(mb);
         // Add Buttons
-        JPanel panelButtonEdge = new JPanel();
-        panelButtonEdge.add(new JLabel("Detect Lines"));
-        panelButtonEdge.add(new JSeparator());
-        panelButtonEdge.add(buttonEdge);
-        panelButtonEdge.add(new JLabel("Detect Lines (Unix/Linux)"));
-        panelButtonEdge.add(new JSeparator());
-        panelButtonEdge.add(buttonScriptEdge);
+
+        JPanel panelButtonDL = new JPanel();
+        panelButtonDL.add(new JLabel("Detect Lines"));
+        panelButtonDL.add(new JSeparator());
+        panelButtonDL.add(buttonEdge);
+
         JPanel panelButtonTransform = new JPanel();
         panelButtonTransform.add(new JLabel("Transform"));
         panelButtonTransform.add(new JSeparator());
         panelButtonTransform.add(buttonResize);
+
+
         JPanel panelButtonColor = new JPanel();
         panelButtonColor.add(new JLabel("Color"));
         panelButtonColor.add(new JSeparator());
@@ -199,10 +242,7 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             textFieldImagePath.setText(chooser.getSelectedFile().getAbsolutePath());
         }
-
-
         imagePath = textFieldImagePath.getText();
-
         if(imagePath.contains(".jpg"))
             extension = ".jpg";
         else if(imagePath.contains(".tiff"))
@@ -213,8 +253,6 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
             extension = ".heic";
         originalImage = imagePath;
         File imgFile = new File(textFieldImagePath.getText());
-        imageDirectory = imgFile.getParent();
-        imageName = imgFile.getName();
         BufferedImage img = ImageIO.read(imgFile);
         ImageIcon icon = new ImageIcon(img);
         JLabel image = new JLabel(icon);
@@ -226,7 +264,7 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
         l_c.setLayout(new BorderLayout());
         l_c.add(menuBar, BorderLayout.NORTH);
         l_c.add(panelButtonColor, BorderLayout.SOUTH);
-        l_c.add(panelButtonEdge, BorderLayout.EAST);
+        l_c.add(panelButtonDL, BorderLayout.EAST);
         l_c.add(panelButtonTransform, BorderLayout.WEST);
         l_c.add(imageScrollPane, BorderLayout.CENTER);
         pack();
@@ -240,6 +278,7 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
     // action listeners
     public void actionPerformed(ActionEvent e) {
         String newImage;
+
         if (e.getSource() == fileOpen) {
             opCount = 0;
             JFileChooser chooser = new JFileChooser();
@@ -251,7 +290,6 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 textFieldImagePath.setText(chooser.getSelectedFile().getAbsolutePath());
             }
-
             imagePath = textFieldImagePath.getText();
             if(imagePath.contains(".jpg"))
                 extension = ".jpg";
@@ -272,14 +310,16 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
             }
             ImageIcon icon = new ImageIcon(img);
             JLabel image = new JLabel(icon);
-            l_c.remove(imageScrollPane);
+           // l_c.remove(imageScrollPane);
             imageScrollPane = new JScrollPane(image);
             l_c.add(imageScrollPane);
             historyList.clear();
             l_c.revalidate();
             buttonLastImage.setEnabled(false);
         }
+    
 
+        
         else if (e.getSource() == fileSaveAs) {
             JFileChooser fileChooser = new JFileChooser();
             FileNameExtensionFilter filter = new FileNameExtensionFilter(
@@ -299,6 +339,7 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
                 }
             }
         }
+
 
         else if (e.getSource() == historyShowHistory) {
             JTextArea textArea = new JTextArea();
@@ -340,6 +381,7 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
             lastImage = null;
             buttonLastImage.setEnabled(false);
         }
+
         else if (e.getSource() == buttonEdge | e.getSource() == toolsEdge) {
             opCount++;
             JTextField thickness = new JTextField();
@@ -382,50 +424,27 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
             buttonLastImage.setEnabled(true);
         }
 
-
-        else if (e.getSource() == buttonScriptEdge | e.getSource() == scriptEdge) {
+        else if (e.getSource() == scriptEdge) {
             opCount++;
-            JTextField Radius = new JTextField();
-            JTextField LowerLimit = new JTextField();
-            JTextField UpperLimit = new JTextField();
-            JPanel CannyThreshold = new JPanel();
-            CannyThreshold.setLayout(new GridLayout(4, 4));
-            CannyThreshold.add(new JLabel("Radius (MxN): "));
-            CannyThreshold.add(Radius);
-            CannyThreshold.add(new JLabel("Lower Percent: "));
-            CannyThreshold.add(LowerLimit);
-            CannyThreshold.add(new JLabel("Upper Percent: "));
-            CannyThreshold.add(UpperLimit);
-            JOptionPane.showConfirmDialog(null, CannyThreshold,
-                    "Canny Edge Detection Parameter", JOptionPane.OK_CANCEL_OPTION);
-            String threshold = String.valueOf(Radius.getText()) + "+" + String.valueOf(LowerLimit.getText()) + "%+" + String.valueOf(UpperLimit.getText())+"%";
+            JTextField thickness = new JTextField();
+            JPanel edgePanel = new JPanel();
 
-            //start() will be in try catch
-            File file1 = new File("./bash_scripts/band_detection_real.sh");
-            file1.setExecutable(true);
             try {
-                ProcessBuilder pb = new ProcessBuilder("./bash_scripts/band_detection_real.sh");
+                ProcessBuilder pb = new ProcessBuilder("./band_detection_real.sh");
                 Map<String, String> env = pb.environment();
-                env.put("VAR1", this.imageDirectory);
-                env.put("VAR2", this.imageName);
-                env.put("VAR3", threshold);
+                env.put("VAR1", imagePath);
                 Process p = pb.start();
                 p.waitFor();
                 System.out.println("Script executed successfully");
-                historyList.add("Edge Script(OS/Linux): radius: " + Radius.getText() + " lower limit: " + LowerLimit.getText() + " upper limit: " + UpperLimit.getText());
             } catch (IOException | InterruptedException ex) {
                 throw new RuntimeException(ex);
             }
 
-            Path pathtoFolder = Path.of(imageDirectory);
-            Path pathtoFile = pathtoFolder.resolve("composite.png");
-
+            newImage = "composite.png";
             lastImage = imagePath;
-            imagePath = String.valueOf(pathtoFile);
-
+            imagePath = newImage;
             File imgFile = new File(imagePath);
             BufferedImage img;
-            System.out.println(imgFile);
             try {
                 img = ImageIO.read(imgFile);
             } catch (IOException ex) {
@@ -505,19 +524,13 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
                 throw new RuntimeException(ex);
             }
 
-            //Update permissions for bash script
-
-            File file1 = new File("./bash_scripts/brightness_contrast.sh");
-            file1.setExecutable(true);
-
             // Process builder calls bash script
             try {
-                ProcessBuilder pb = new ProcessBuilder("./bash_scripts/brightness_contrast.sh");
+                ProcessBuilder pb = new ProcessBuilder(new String[]{"bash_scripts/brightness_contrast.sh"});
                 Map<String, String> env = pb.environment();
-                env.put("VAR1", this.lastImage);
+                env.put("VAR1", this.imagePath);
                 env.put("VAR2", String.valueOf(sliderB.getValue()));
                 env.put("VAR3", String.valueOf(sliderC.getValue()));
-                env.put("VAR4", this.imagePath);
                 Process p = pb.start();
                 p.waitFor();
                 System.out.println("Script executed successfully");
@@ -569,20 +582,13 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
                     throw new RuntimeException(ex);
                 }
 
-                //Update permissions for bash script
-
-                File file1 = new File("./bash_scripts/resize.sh");
-                file1.setExecutable(true);
-
                 // Process builder calls bash script
                 try {
-                    ProcessBuilder pb = new ProcessBuilder("bash_scripts/resize.sh");
+                    ProcessBuilder pb = new ProcessBuilder(new String[]{"bash_scripts/resize.sh"});
                     Map<String, String> env = pb.environment();
-                    env.put("VAR1", this.lastImage);
+                    env.put("VAR1", this.imagePath);
                     env.put("VAR2", String.valueOf(width.getText()));
                     env.put("VAR3", String.valueOf(height.getText()));
-                    env.put("VAR4", this.imagePath);
-
                     Process p = pb.start();
                     p.waitFor();
                     System.out.println("Script executed successfully");
@@ -628,18 +634,12 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
-            //Update permissions for bash script
-
-            File file1 = new File("./bash_scripts/monochrome.sh");
-            file1.setExecutable(true);
 
             // Process builder calls bash script
             try {
-                ProcessBuilder pb = new ProcessBuilder("./bash_scripts/monochrome.sh");
+                ProcessBuilder pb = new ProcessBuilder(new String[]{"bash_scripts/monochrome.sh"});
                 Map<String, String> env = pb.environment();
-                env.put("VAR1", this.lastImage);
-                env.put("VAR2", this.imagePath);
-
+                env.put("VAR1", this.imagePath);
                 Process p = pb.start();
                 p.waitFor();
                 System.out.println("Script executed successfully");
@@ -683,17 +683,11 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
                 throw new RuntimeException(ex);
             }
 
-            //Update permissions for bash script
-
-            File file1 = new File("./bash_scripts/invert.sh");
-            file1.setExecutable(true);
-
             // Process builder calls bash script
             try {
-                ProcessBuilder pb = new ProcessBuilder("./bash_scripts/invert.sh");
+                ProcessBuilder pb = new ProcessBuilder(new String[]{"bash_scripts/invert.sh"});
                 Map<String, String>env = pb.environment();
-                env.put("VAR1", this.lastImage);
-                env.put("VAR2", this.imagePath);
+                env.put("VAR1", this.imagePath);
                 Process p = pb.start();
                 p.waitFor();
                 System.out.println("Script executed successfully");
@@ -746,20 +740,13 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
                 throw new RuntimeException(ex);
             }
 
-            //Update permissions for bash script
-
-            File file1 = new File("./bash_scripts/sigmoidal.sh");
-            file1.setExecutable(true);
-
             // Process builder calls bash script
             try {
-                ProcessBuilder pb = new ProcessBuilder("./bash_scripts/sigmoidal.sh");
+                ProcessBuilder pb = new ProcessBuilder(new String[]{"bash_scripts/sigmoidal.sh"});
                 Map<String, String> env = pb.environment();
-                env.put("VAR1", this.lastImage);
+                env.put("VAR1", this.imagePath);
                 env.put("VAR2", String.valueOf(cc.getText()));
                 env.put("VAR3", String.valueOf(cf.getText()));
-                env.put("VAR4", this.imagePath);
-
                 Process p = pb.start();
                 p.waitFor();
                 System.out.println("Script executed successfully");
@@ -806,14 +793,9 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
                 throw new RuntimeException(ex);
             }
 
-            //Update permissions for bash script
-
-            File file1 = new File("./bash_scripts/remove_last.sh");
-            file1.setExecutable(true);
-
             // Process builder calls bash script
             try {
-                ProcessBuilder pb = new ProcessBuilder("./bash_scripts/remove_last.sh");
+                ProcessBuilder pb = new ProcessBuilder(new String[]{"bash_scripts/remove_last.sh"});
                 Process p = pb.start();
                 p.waitFor();
                 System.out.println("Script executed successfully");
