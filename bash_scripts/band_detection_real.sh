@@ -1,6 +1,7 @@
 
 #Moves into the directory of the image
 # shellcheck disable=SC2164
+# VAR1 = image directory
 cd "$VAR1"
 
 #Removes any temporary files or appended files
@@ -10,6 +11,7 @@ rm houghexec*
 rm imageReconstruction*
 
 #makes sure bands are white and the background is black.
+# VAR2 = input file name
 magick "$VAR2" -channel RGB -negate badbandstest.png
 
 #Canny edge detection algorithm
@@ -113,3 +115,13 @@ chmod +x imageReconstruction_real.sh
 #removes temporary files
 rm *.tmp
 rm test_*
+
+
+
+### PETER'S NOTES ###
+# try #!/bin/bash -v at start of script, https://superuser.com/questions/387007/equivalent-echo-on-for-linux 
+# echo/ printf for each line?, not ideal
+# have everything from this script run into a separate folder? 
+# wrap everything in {} and output to output.sh or another file? 
+#   https://unix.stackexchange.com/questions/695906/prepare-shell-script-for-output-to-file-and-console
+#   https://linuxize.com/post/linux-tee-command/ 
