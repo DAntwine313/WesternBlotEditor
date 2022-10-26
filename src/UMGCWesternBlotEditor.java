@@ -122,18 +122,6 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
         // quick key strokes ->  Save As = Ctrl-A
         file.add(fileSaveAs);
         fileSaveAs.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.CTRL_MASK));
-// exit button
-
-        JMenuItem exitbutton = new JMenuItem("Exit");
-        exitbutton.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.CTRL_DOWN_MASK));
-        exitbutton.setForeground(Color.RED);
-        file.add(exitbutton);
-        exitbutton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                System.exit(EXIT_ON_CLOSE);
-            }
-        });
 
         ///EDIT MENU
         JMenu edit = new JMenu("Edit");
@@ -249,15 +237,6 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
         UMGCWesternBlotEditor t = new UMGCWesternBlotEditor();
         t.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        // create output.sh file with date, filepath and user commented out
-        File file = new File("./output.sh");
-        FileWriter fileWriter = null;
-        try {
-            fileWriter = new FileWriter(file);
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-
     }
     // action listeners
     public void actionPerformed(ActionEvent e) {
@@ -300,6 +279,22 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
             historyList.clear();
             l_c.revalidate();
             buttonLastImage.setEnabled(false);
+
+            // create output.sh file with date, filepath and user commented out
+            FileWriter fileWriter = new FileWriter(output.sh);
+            PrintWriter printWriter = new PrintWriter(fileWriter);
+            Date date = new Date();
+            // call Path class allows the use of .getFileName() which is needed to pass the file name
+            // rather than the absolute path to the bash script
+            Path new_path = Paths.get(this.imagePath);
+            String input_file_path = String.valueOf(new_path);
+            String input_file_name = String.valueOf(new_path.getFileName());
+
+            printWriter.printf("\nScript created on: %c", date);
+            printWriter.printf("\nOriginal Filepath: %d", input_file_path);
+            printWriter.printf("\nOriginal Filename: %d", input_file_name);
+            printWriter.printf("\n");
+            printWriter.close();
         }
 
         else if (e.getSource() == fileSaveAs) {
@@ -422,6 +417,23 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
                     "Canny Edge Detection Parameter", JOptionPane.OK_CANCEL_OPTION);
             String threshold = String.valueOf(Radius.getText()) + "+" + String.valueOf(LowerLimit.getText()) + "%+" + String.valueOf(UpperLimit.getText())+"%";
 
+            //start() will be in try catch
+            File file1 = new File("./bash_scripts/band_detection_real.sh");
+            file1.setExecutable(true);
+            try {
+                ProcessBuilder pb = new ProcessBuilder("./bash_scripts/band_detection_real.sh");
+                Map<String, String> env = pb.environment();
+                env.put("VAR1", this.imageDirectory);
+                env.put("VAR2", this.imageName);
+                env.put("VAR3", threshold);
+                Process p = pb.start();
+                p.waitFor();
+                System.out.println("Script executed successfully");
+                historyList.add("Edge Script(OS/Linux): radius: " + Radius.getText() + " lower limit: " + LowerLimit.getText() + " upper limit: " + UpperLimit.getText());
+            } catch (IOException | InterruptedException ex) {
+                throw new RuntimeException(ex);
+            }
+
             Path pathtoFolder = Path.of(imageDirectory);
             Path pathtoFile = pathtoFolder.resolve("composite.png");
 
@@ -436,31 +448,6 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
-
-            //start() will be in try catch
-            File file1 = new File("./bash_scripts/band_detection_real.sh");
-            file1.setExecutable(true);
-            try {
-                ProcessBuilder pb = new ProcessBuilder("./bash_scripts/band_detection_real.sh");
-                Map<String, String> env = pb.environment();
-                // call Path class allows the use of .getFileName() which is needed to pass the file name
-                // rather than the absolute path to the bash script
-                Path last_path = Paths.get(this.lastImage);
-                // Path new_path = Paths.get(this.imagePath); //ps* need to figure out output file in Bash Script, is it composite.png? YES
-                String input_file_name = String.valueOf(last_path.getFileName());
-                // String output_file_name = String.valueOf(new_path.getFileName()); //ps*  
-
-                env.put("VAR1", this.imageDirectory);
-                env.put("VAR2", input_file_name);
-                env.put("VAR3", threshold);
-                Process p = pb.start();
-                p.waitFor();
-                System.out.println("Script executed successfully");
-                historyList.add("Edge Script(OS/Linux): radius: " + Radius.getText() + " lower limit: " + LowerLimit.getText() + " upper limit: " + UpperLimit.getText());
-            } catch (IOException | InterruptedException ex) {
-                throw new RuntimeException(ex);
-            }
-
             ImageIcon icon = new ImageIcon(img);
             JLabel image = new JLabel(icon);
             l_c.remove(imageScrollPane);
@@ -769,14 +756,14 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
         }
         else if (e.getSource() == buttonSC | e.getSource() == toolsSC) {
             opCount++;
-            JTextField contrast = new JTextField(5);
-            JTextField midpoint = new JTextField(5);
+            JTextField cc = new JTextField(5);
+            JTextField cf = new JTextField(5);
             JPanel CSPanel = new JPanel();
             CSPanel.setLayout(new GridLayout(2, 2));
-            CSPanel.add(new JLabel("Contrast: "));
-            CSPanel.add(contrast);
-            CSPanel.add(new JLabel("Midpoint(Threshold): "));
-            CSPanel.add(midpoint);
+            CSPanel.add(new JLabel("Contrast Center(%): "));
+            CSPanel.add(cc);
+            CSPanel.add(new JLabel("Contrast Factor: "));
+            CSPanel.add(cf);
             JOptionPane.showConfirmDialog(null, CSPanel,
                     "Sigmoidal Contrasting", JOptionPane.OK_CANCEL_OPTION);
             // ImageMagick Call
@@ -784,9 +771,9 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
             // create the operation, add images and operators/options
             IMOperation op = new IMOperation();
             op.addImage(imagePath);
-            op.sigmoidalContrast(Double.parseDouble(contrast.getText()), Double.parseDouble(midpoint.getText()));
+            op.sigmoidalContrast(Double.parseDouble(cc.getText()), Double.parseDouble(cf.getText()));
             newImage = imagePath.replace(extension, "_"+opCount+extension);
-            historyList.add("sigmoidal contrast: center= " + contrast.getText() + " factor= " + midpoint.getText());
+            historyList.add("sigmoidal contrast: center= " + cc.getText() + " factor= " + cf.getText());
             op.addImage(newImage);
             // execute the operation
             try {
@@ -821,8 +808,8 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
                 String output_file_name = String.valueOf(new_path.getFileName());
 
                 env.put("VAR1", input_file_name);
-                env.put("VAR2", String.valueOf(contrast.getText()));
-                env.put("VAR3", String.valueOf(midpoint.getText()));
+                env.put("VAR2", String.valueOf(cc.getText()));
+                env.put("VAR3", String.valueOf(cf.getText()));
                 env.put("VAR4", output_file_name);
                 Process p = pb.start();
                 p.waitFor();
