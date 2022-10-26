@@ -279,22 +279,6 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
             historyList.clear();
             l_c.revalidate();
             buttonLastImage.setEnabled(false);
-
-            // create output.sh file with date, filepath and user commented out
-            FileWriter fileWriter = new FileWriter(output.sh);
-            PrintWriter printWriter = new PrintWriter(fileWriter);
-            Date date = new Date();
-            // call Path class allows the use of .getFileName() which is needed to pass the file name
-            // rather than the absolute path to the bash script
-            Path new_path = Paths.get(this.imagePath);
-            String input_file_path = String.valueOf(new_path);
-            String input_file_name = String.valueOf(new_path.getFileName());
-
-            printWriter.printf("\nScript created on: %c", date);
-            printWriter.printf("\nOriginal Filepath: %d", input_file_path);
-            printWriter.printf("\nOriginal Filename: %d", input_file_name);
-            printWriter.printf("\n");
-            printWriter.close();
         }
 
         else if (e.getSource() == fileSaveAs) {
