@@ -1,5 +1,8 @@
 # UMGCWesternBlotEditor
-This program integrates Image Magick with an user interface, for the purposes of better imaging for Western Blot gels.
+This program integrates Image Magick with an user interface, for the purposes of better imaging for Western Blot gels. 
+After modification in the program, a bash script is generated to achieve the same results directly in image magick. Also,
+scripts can be added to run custom algorithms. Notice the band edge detection script included in this program available 
+currently only for OS/Linux users.
 
 For best results please create a folder for each image to work on as intermediates are created after each modification
 
