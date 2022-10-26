@@ -279,6 +279,22 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
             historyList.clear();
             l_c.revalidate();
             buttonLastImage.setEnabled(false);
+
+            // create output.sh file with date, filepath and user commented out
+            FileWriter fileWriter = new FileWriter(output.sh);
+            PrintWriter printWriter = new PrintWriter(fileWriter);
+            Date date = new Date();
+            // call Path class allows the use of .getFileName() which is needed to pass the file name
+            // rather than the absolute path to the bash script
+            Path new_path = Paths.get(this.imagePath);
+            String input_file_path = String.valueOf(new_path);
+            String input_file_name = String.valueOf(new_path.getFileName());
+
+            printWriter.printf("\nScript created on: %c", date);
+            printWriter.printf("\nOriginal Filepath: %d", input_file_path);
+            printWriter.printf("\nOriginal Filename: %d", input_file_name);
+            printWriter.printf("\n");
+            printWriter.close();
         }
 
         else if (e.getSource() == fileSaveAs) {
@@ -401,23 +417,6 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
                     "Canny Edge Detection Parameter", JOptionPane.OK_CANCEL_OPTION);
             String threshold = String.valueOf(Radius.getText()) + "+" + String.valueOf(LowerLimit.getText()) + "%+" + String.valueOf(UpperLimit.getText())+"%";
 
-            //start() will be in try catch
-            File file1 = new File("./bash_scripts/band_detection_real.sh");
-            file1.setExecutable(true);
-            try {
-                ProcessBuilder pb = new ProcessBuilder("./bash_scripts/band_detection_real.sh");
-                Map<String, String> env = pb.environment();
-                env.put("VAR1", this.imageDirectory);
-                env.put("VAR2", this.imageName);
-                env.put("VAR3", threshold);
-                Process p = pb.start();
-                p.waitFor();
-                System.out.println("Script executed successfully");
-                historyList.add("Edge Script(OS/Linux): radius: " + Radius.getText() + " lower limit: " + LowerLimit.getText() + " upper limit: " + UpperLimit.getText());
-            } catch (IOException | InterruptedException ex) {
-                throw new RuntimeException(ex);
-            }
-
             Path pathtoFolder = Path.of(imageDirectory);
             Path pathtoFile = pathtoFolder.resolve("composite.png");
 
@@ -432,6 +431,31 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
+
+            //start() will be in try catch
+            File file1 = new File("./bash_scripts/band_detection_real.sh");
+            file1.setExecutable(true);
+            try {
+                ProcessBuilder pb = new ProcessBuilder("./bash_scripts/band_detection_real.sh");
+                Map<String, String> env = pb.environment();
+                // call Path class allows the use of .getFileName() which is needed to pass the file name
+                // rather than the absolute path to the bash script
+                Path last_path = Paths.get(this.lastImage);
+                // Path new_path = Paths.get(this.imagePath); //ps* need to figure out output file in Bash Script, is it composite.png? YES
+                String input_file_name = String.valueOf(last_path.getFileName());
+                // String output_file_name = String.valueOf(new_path.getFileName()); //ps*  
+
+                env.put("VAR1", this.imageDirectory);
+                env.put("VAR2", input_file_name);
+                env.put("VAR3", threshold);
+                Process p = pb.start();
+                p.waitFor();
+                System.out.println("Script executed successfully");
+                historyList.add("Edge Script(OS/Linux): radius: " + Radius.getText() + " lower limit: " + LowerLimit.getText() + " upper limit: " + UpperLimit.getText());
+            } catch (IOException | InterruptedException ex) {
+                throw new RuntimeException(ex);
+            }
+
             ImageIcon icon = new ImageIcon(img);
             JLabel image = new JLabel(icon);
             l_c.remove(imageScrollPane);
