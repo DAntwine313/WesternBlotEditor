@@ -1,0 +1,9 @@
+<changelist name="Uncommitted_changes_before_rebase_[Changes]" date="1665237038619" recycled="false" toDelete="true">
+  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_rebase_[Changes]/shelved.patch" />
+  <option name="DESCRIPTION" value="Uncommitted changes before rebase [Changes]" />
+  <binary>
+    <option name="BEFORE_PATH" value="out/production/WesternBlotEditor/UMGCWesternBlotEditor.class" />
+    <option name="AFTER_PATH" value="out/production/WesternBlotEditor/UMGCWesternBlotEditor.class" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_rebase_[Changes]/UMGCWesternBlotEditor.class" />
+  </binary>
+</changelist>

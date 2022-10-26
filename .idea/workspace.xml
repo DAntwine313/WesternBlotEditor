@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="01d4cc83-2894-449c-9f15-a23b0f5d1eef" name="Changes" comment="add process builder to execute bash script">
+      <change beforePath="$PROJECT_DIR$/out/production/WesternBlotEditor/UMGCWesternBlotEditor.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/WesternBlotEditor/UMGCWesternBlotEditor.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/UMGCWesternBlotEditor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/UMGCWesternBlotEditor.java" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="main" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectId" id="2EjVeRi5af1NfxHzlNGzrBf12sx" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="project.structure.last.edited" value="Modules" />
+    <property name="project.structure.proportion" value="0.15" />
+    <property name="project.structure.side.proportion" value="0.2" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/bash_script" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Application.UMGCWesternBlotEditor">
+    <configuration name="UMGCWesternBlotEditor" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="UMGCWesternBlotEditor" />
+      <module name="WesternBlotEditor" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="UMGCWesternBlotEditor" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="UMGCWesternBlotEditor" />
+      <module name="WesternBlotEditor" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="brightness_contrast.sh" type="ShConfigurationType" temporary="true">
+      <option name="SCRIPT_TEXT" value="" />
+      <option name="INDEPENDENT_SCRIPT_PATH" value="true" />
+      <option name="SCRIPT_PATH" value="$PROJECT_DIR$/bash_script/brightness_contrast.sh" />
+      <option name="SCRIPT_OPTIONS" value="" />
+      <option name="INDEPENDENT_SCRIPT_WORKING_DIRECTORY" value="true" />
+      <option name="SCRIPT_WORKING_DIRECTORY" value="$PROJECT_DIR$/bash_script" />
+      <option name="INDEPENDENT_INTERPRETER_PATH" value="true" />
+      <option name="INTERPRETER_PATH" value="/bin/bash" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="EXECUTE_IN_TERMINAL" value="true" />
+      <option name="EXECUTE_SCRIPT_FILE" value="true" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="Application.UMGCWesternBlotEditor" />
+      <item itemvalue="Shell Script.brightness_contrast.sh" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.UMGCWesternBlotEditor" />
+        <item itemvalue="Shell Script.brightness_contrast.sh" />
+        <item itemvalue="Application.UMGCWesternBlotEditor" />
+        <item itemvalue="Application.UMGCWesternBlotEditor" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="01d4cc83-2894-449c-9f15-a23b0f5d1eef" name="Changes" comment="" />
+      <created>1663109083060</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1663109083060</updated>
+    </task>
+    <task id="LOCAL-00001" summary="add process builder to execute bash script">
+      <created>1665237352178</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1665237352178</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
+    <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Trying to put it all together.&#10;&#10;I created the file bash_output which is the most recent version of mine and Jacob's work on the bash script.&#10;&#10;The file is in the project repository, so we should be able to make changes to the bash script from that point here on out. &#10;&#10;The bash script is called by the Java code, but isn't executing correctly. Not sure why, but that's my next step" />
+    <MESSAGE value="add process builder to execute bash script" />
+    <option name="LAST_COMMIT_MESSAGE" value="add process builder to execute bash script" />
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/WesternBlotEditor$UMGCWesternBlotEditor.ic" NAME="UMGCWesternBlotEditor Coverage Results" MODIFIED="1665951235975" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />
+  </component>
+</project>
