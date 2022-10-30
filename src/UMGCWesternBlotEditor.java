@@ -237,6 +237,7 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
         UMGCWesternBlotEditor t = new UMGCWesternBlotEditor();
         t.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
+
     }
     // action listeners
     public void actionPerformed(ActionEvent e) {
@@ -401,32 +402,78 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
                     "Canny Edge Detection Parameter", JOptionPane.OK_CANCEL_OPTION);
             String threshold = String.valueOf(Radius.getText()) + "+" + String.valueOf(LowerLimit.getText()) + "%+" + String.valueOf(UpperLimit.getText())+"%";
 
+
+
             //start() will be in try catch
             File file1 = new File("./bash_scripts/band_detection_real.sh");
             file1.setExecutable(true);
+
+            File file2 = new File("./bash_scripts/paste_banddetection.sh");
+            file2.setExecutable(true);
+
             try {
+
+                BufferedImage imgDim = ImageIO.read(new File(imagePath));
+                int width          = imgDim.getWidth();
+                int height         = imgDim.getHeight();
+                String imgDimensions = String.valueOf(width) + "x" + String.valueOf(height);
+                String var1 = "\"$VAR1\"";
+                String var2 = "\"$VAR2\"";
+                String var3 = "\"$VAR3\"";
+                String var4 = "'$VAR4'";
+                String currentLine;
+
                 ProcessBuilder pb = new ProcessBuilder("./bash_scripts/band_detection_real.sh");
+
                 Map<String, String> env = pb.environment();
+
                 env.put("VAR1", this.imageDirectory);
                 env.put("VAR2", this.imageName);
                 env.put("VAR3", threshold);
+                env.put("VAR4", imgDimensions);
+
                 Process p = pb.start();
+
+
+                FileReader istream;
+                istream = new FileReader("bash_scripts/band_detection_real.sh");
+                BufferedReader reader;
+                reader = new BufferedReader(istream);
+
+                FileWriter ostream;
+                ostream = new FileWriter("output.sh", true);
+                BufferedWriter writer;
+                writer = new BufferedWriter(ostream);
+
+                while((currentLine = reader.readLine()) != null) {
+
+                    currentLine = currentLine.replace(var1, this.imageDirectory);
+                    currentLine = currentLine.replace(var2, this.imageName);
+                    currentLine = currentLine.replace(var3, threshold);
+                    currentLine = currentLine.replace(var4, imgDimensions);
+
+                    writer.write(currentLine + "\n");
+                }
+
+                reader.close();
+                writer.close();
                 p.waitFor();
+
                 System.out.println("Script executed successfully");
+
                 historyList.add("Edge Script(OS/Linux): radius: " + Radius.getText() + " lower limit: " + LowerLimit.getText() + " upper limit: " + UpperLimit.getText());
             } catch (IOException | InterruptedException ex) {
                 throw new RuntimeException(ex);
             }
 
+
             Path pathtoFolder = Path.of(imageDirectory);
             Path pathtoFile = pathtoFolder.resolve("composite.png");
-
             lastImage = imagePath;
             imagePath = String.valueOf(pathtoFile);
-
             File imgFile = new File(imagePath);
             BufferedImage img;
-            System.out.println(imgFile);
+
             try {
                 img = ImageIO.read(imgFile);
             } catch (IOException ex) {
@@ -498,6 +545,7 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
             // Update image path and reload image in JScrollPane
             lastImage = imagePath;
             imagePath = newImage;
+
             File imgFile = new File(imagePath);
             BufferedImage img;
             try {
