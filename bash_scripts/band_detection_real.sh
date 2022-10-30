@@ -1,13 +1,14 @@
-
-#Moves into the directory of the image
-# shellcheck disable=SC2164
-cd "$VAR1"
-
 #Removes any temporary files or appended files
 rm *.tmp
 rm test*
 rm houghexec*
 rm imageReconstruction*
+rm composite.png
+rm parsedoutput.txt
+
+#Moves into the directory of the image
+# shellcheck disable=SC2164
+cd "$VAR1"
 
 #makes sure bands are white and the background is black.
 magick "$VAR2" -channel RGB -negate badbandstest.png
@@ -34,7 +35,7 @@ while read -r line;do
     filepng=$(echo "$filename".png)
     bounding_box=$(echo "$line")
 
-    magick -size 518x136 -depth 8 -extract "$bounding_box" \
+    magick -size "$VAR4" -depth 8 -extract "$bounding_box" \
         badbandstest.png "$filepng"
     echo "\(" "$filepng" >> filenames.tmp
 done < verbosedata.tmp
@@ -105,11 +106,12 @@ done < verbosedata_resize.tmp
 
 #merges the files together, makes the file executable, and run the executable
 paste filenames.tmp test1.tmp test2.tmp test3.tmp > imageReconstruction.tmp
-sed '1 s/^/magick -size 518x136 xc:black \\\n/' imageReconstruction.tmp > imageReconstruction_real.sh
+sed '1 s/^/magick -size '$VAR4' xc:black \\\n/' imageReconstruction.tmp > imageReconstruction_real.sh
 echo "composite.png" >> imageReconstruction_real.sh
 chmod +x imageReconstruction_real.sh
 ./imageReconstruction_real.sh
 
 #removes temporary files
+touch ../parsedoutput.txt
 rm *.tmp
 rm test_*
