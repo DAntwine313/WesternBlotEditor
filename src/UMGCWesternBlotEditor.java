@@ -390,6 +390,7 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
             JTextField Radius = new JTextField();
             JTextField LowerLimit = new JTextField();
             JTextField UpperLimit = new JTextField();
+            JTextField HoughThreshold = new JTextField();
             JPanel CannyThreshold = new JPanel();
             CannyThreshold.setLayout(new GridLayout(4, 4));
             CannyThreshold.add(new JLabel("Radius (MxN): "));
@@ -398,9 +399,11 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
             CannyThreshold.add(LowerLimit);
             CannyThreshold.add(new JLabel("Upper Percent: "));
             CannyThreshold.add(UpperLimit);
+            CannyThreshold.add(new JLabel("Hough-line threshold: "));
+            CannyThreshold.add(HoughThreshold);
             JOptionPane.showConfirmDialog(null, CannyThreshold,
                     "Canny Edge Detection Parameter", JOptionPane.OK_CANCEL_OPTION);
-            String threshold = String.valueOf(Radius.getText()) + "+" + String.valueOf(LowerLimit.getText()) + "%+" + String.valueOf(UpperLimit.getText())+"%";
+
 
 
 
@@ -408,8 +411,6 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
             File file1 = new File("./bash_scripts/band_detection_real.sh");
             file1.setExecutable(true);
 
-            File file2 = new File("./bash_scripts/paste_banddetection.sh");
-            file2.setExecutable(true);
 
             try {
 
@@ -417,10 +418,13 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
                 int width          = imgDim.getWidth();
                 int height         = imgDim.getHeight();
                 String imgDimensions = String.valueOf(width) + "x" + String.valueOf(height);
+                String threshold = String.valueOf(Radius.getText()) + "+" + String.valueOf(LowerLimit.getText()) + "%+" + String.valueOf(UpperLimit.getText())+"%";
+                String houghThreshold = String.valueOf("+"+HoughThreshold.getText());
                 String var1 = "\"$VAR1\"";
                 String var2 = "\"$VAR2\"";
                 String var3 = "\"$VAR3\"";
                 String var4 = "'$VAR4'";
+                String var5 = "\"$VAR5\"";
                 String currentLine;
 
                 ProcessBuilder pb = new ProcessBuilder("./bash_scripts/band_detection_real.sh");
@@ -431,6 +435,7 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
                 env.put("VAR2", this.imageName);
                 env.put("VAR3", threshold);
                 env.put("VAR4", imgDimensions);
+                env.put("VAR5", houghThreshold);
 
                 Process p = pb.start();
 
@@ -451,6 +456,7 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
                     currentLine = currentLine.replace(var2, this.imageName);
                     currentLine = currentLine.replace(var3, threshold);
                     currentLine = currentLine.replace(var4, imgDimensions);
+                    currentLine = currentLine.replace(var5, houghThreshold);
 
                     writer.write(currentLine + "\n");
                 }
@@ -461,7 +467,7 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
 
                 System.out.println("Script executed successfully");
 
-                historyList.add("Edge Script(OS/Linux): radius: " + Radius.getText() + " lower limit: " + LowerLimit.getText() + " upper limit: " + UpperLimit.getText());
+                historyList.add("Edge Script(OS/Linux): radius: " + Radius.getText() + " lower limit: " + LowerLimit.getText() + " upper limit: " + UpperLimit.getText() + " Hough-line threshold: " + HoughThreshold.getText());
             } catch (IOException | InterruptedException ex) {
                 throw new RuntimeException(ex);
             }
@@ -486,6 +492,7 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
             l_c.add(imageScrollPane);
             l_c.revalidate();
             buttonLastImage.setEnabled(true);
+            System.out.println("Script executed successfully");
         }
         else if (e.getSource() == buttonBrightnessContrast | e.getSource() == toolsBC) {
             opCount++;
