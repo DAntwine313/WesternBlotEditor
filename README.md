@@ -18,6 +18,33 @@ To control only brightness, set contrast=0 or just leave it off.
 -
 Detect edges within an image.
 
+-Edge detection/band straightener
+-
+Detect edges within an image through canny edge detection algorithm and alters the detected item's orientation using a 
+Hough-line algorithm. 
+
+-Canny Edge Detection: {radius}+{lower-percent}+{upper-percent}
+
+"The thresholds range from 0 to 100% (e.g. -canny 0x1+10%+30%) with {+lower-percent} < {+upper-percent}. If {+upper-percent}
+is increased but {+lower-percent} remains the same, lesser edge components will be detected, but their lengths will be 
+the same. If {+lower-percent} is increased but {+upper-percent} is the same, the same number of edge components will be 
+detected but their lengths will be shorter. The default thresholds are shown. The radius{xsigma} controls a gaussian blur 
+applied to the input image to reduce noise and smooth the edges".<sup>1</sup>
+
+
+-Hough-line Transformation
+
+"Use the Hough line detector with any binary edge extracted image to locate and draw any straight lines that it finds.
+The process accumulates counts for every white pixel in the binary edge image for every possible orientation (for angles
+from 0 to 179 in 1 deg increments) and distance from the center of the image to the corners (in 1 px increments). 
+It stores the counts in an accumulator matrix of angle vs distance. The size of the accumulator will be 180x(diagonal/2). 
+Next it searches the accumulator for peaks in counts and converts the locations of the peaks to slope and intercept in 
+the normal x,y input image space. The algorithm uses slope/intercepts to find the endpoints clipped to the bounds of the 
+image. The lines are drawn from the given endpoints. The counts are a measure of the length of the lines."<sup>2</sup>
+
+<sup>1, 2</sup>The ImageMagick Development Team. (2021). ImageMagick. Retrieved from https://imagemagick.org
+
+
 -get last image
 -
 Feature may only be used to undo changes once until another modification has been made to allow for some forgiveness when manipulating image.
