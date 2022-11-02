@@ -1,14 +1,14 @@
+
+#Moves into the directory of the image
+# shellcheck disable=SC2164
+cd "$VAR1"
+
 #Removes any temporary files or appended files
 rm *.tmp
 rm test*
 rm houghexec*
 rm imageReconstruction*
 rm composite.png
-rm parsedoutput.txt
-
-#Moves into the directory of the image
-# shellcheck disable=SC2164
-cd "$VAR1"
 
 #makes sure bands are white and the background is black.
 magick "$VAR2" -channel RGB -negate badbandstest.png
@@ -32,13 +32,21 @@ n=0;
 while read -r line;do
     n=$((n+1))
     filename=$(echo test_"$n")
+    filename2=$(echo test_"$n"_"$n")
     filepng=$(echo "$filename".png)
+    filepng2=$(echo "$filename2".png)
     bounding_box=$(echo "$line")
 
     magick -size "$VAR4" -depth 8 -extract "$bounding_box" \
-        badbandstest.png "$filepng"
+        verboseimage.png "$filepng"
     echo "\(" "$filepng" >> filenames.tmp
+    magick -size "$VAR4" -depth 8 -extract "$bounding_box" \
+        badbandstest.png "$filepng2"
+    echo "\(" "$filepng2" >> filenames2.tmp
+
 done < verbosedata.tmp
+
+
 
 #creates a file containing the hough-line algorithm
 n=0;
@@ -47,7 +55,7 @@ while read -r line;do
     filename=$(echo test_"$n")
     filepng=$(echo "$filename".png)
     echo "magick" "$filepng" "\\( +clone -background none -fill red -strokewidth 1 -hough-lines" "$line""+30 -write" "$filename""_line.png \\) -composite" "$filename""_hough.png" >> houghexec.sh
-    echo "magick" "$filename""_hough.png -hough-lines" "$line""+30" "$filename""_hough.mvg" >> houghexec.sh
+    echo "magick" "$filename""_hough.png -hough-lines" "$line""$VAR5" "$filename""_hough.mvg" >> houghexec.sh
     echo "$filename""_hough.mvg" >> hough_filenames.tmp
 done < verbosedata_geometry.tmp
 
@@ -97,7 +105,7 @@ while read -r a;do
 done < verbosedata_geometry.tmp
 
 while read -r b; do
-    echo "-rotate" "$b" "-background none \) -geometry" >> test2.tmp
+    echo "-background none -rotate" "$b" "\) -geometry" >> test2.tmp
 done < rotate.tmp
 
 while read -r c;do
@@ -105,13 +113,14 @@ while read -r c;do
 done < verbosedata_resize.tmp
 
 #merges the files together, makes the file executable, and run the executable
-paste filenames.tmp test1.tmp test2.tmp test3.tmp > imageReconstruction.tmp
+paste filenames2.tmp test1.tmp test2.tmp test3.tmp > imageReconstruction.tmp
 sed '1 s/^/magick -size '$VAR4' xc:black \\\n/' imageReconstruction.tmp > imageReconstruction_real.sh
 echo "composite.png" >> imageReconstruction_real.sh
 chmod +x imageReconstruction_real.sh
 ./imageReconstruction_real.sh
 
+#magick composite1.png -channel RGB +negate composite.png
+
 #removes temporary files
-touch ../parsedoutput.txt
 rm *.tmp
 rm test_*
