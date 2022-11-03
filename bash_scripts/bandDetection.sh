@@ -1,0 +1,1 @@
+echo "magick $VAR1 -edge $VAR2 $VAR3" >> output.sh
