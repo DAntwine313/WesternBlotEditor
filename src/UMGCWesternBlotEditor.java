@@ -332,6 +332,7 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
+
             ImageIcon icon = new ImageIcon(img);
             JLabel image = new JLabel(icon);
             l_c.remove(imageScrollPane);
@@ -341,6 +342,17 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
             historyList.clear();
             lastImage = null;
             buttonLastImage.setEnabled(false);
+            File file1 = new File("./bash_scripts/refresh_output.sh");
+            file1.setExecutable(true);
+            try {
+                ProcessBuilder pb = new ProcessBuilder("./bash_scripts/refresh_output.sh");
+                Process p = pb.start();
+                p.waitFor();
+                System.out.println("Script executed successfully");
+            } catch (IOException | InterruptedException ex) {
+                throw new RuntimeException(ex);
+            }
+
         }
         else if (e.getSource() == buttonEdge | e.getSource() == toolsEdge) {
             opCount++;
@@ -366,6 +378,7 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
             } catch (IOException | InterruptedException | IM4JavaException ex) {
                 throw new RuntimeException(ex);
             }
+
             lastImage = imagePath;
             imagePath = newImage;
             File imgFile = new File(imagePath);
@@ -375,6 +388,32 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
+
+
+            File file = new File("./bash_scripts/bandDetection.sh");
+            file.setExecutable(true);
+
+            try {
+                ProcessBuilder pb = new ProcessBuilder("./bash_scripts/bandDetection.sh");
+                Map<String, String> env = pb.environment();
+                // call Path class allows the use of .getFileName() which is needed to pass the file name
+                // rather than the absolute path to the bash script
+                Path last_path = Paths.get(this.lastImage);
+                Path new_path = Paths.get(this.imagePath);
+                String input_file_name = String.valueOf(last_path.getFileName());
+                String output_file_name = String.valueOf(new_path.getFileName());
+
+                env.put("VAR1", input_file_name);
+                env.put("VAR2", thickness.getText());
+                env.put("VAR3", output_file_name);
+                Process p = pb.start();
+                p.waitFor();
+                System.out.println("Script executed successfully");
+            } catch (InterruptedException | IOException var33) {
+                throw new RuntimeException(var33);
+            }
+
+
             ImageIcon icon = new ImageIcon(img);
             JLabel image = new JLabel(icon);
             l_c.remove(imageScrollPane);
@@ -795,14 +834,14 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
         }
         else if (e.getSource() == buttonSC | e.getSource() == toolsSC) {
             opCount++;
-            JTextField contrast = new JTextField(5);
-            JTextField midpoint = new JTextField(5);
+            JTextField cc = new JTextField(5);
+            JTextField cf = new JTextField(5);
             JPanel CSPanel = new JPanel();
             CSPanel.setLayout(new GridLayout(2, 2));
-            CSPanel.add(new JLabel("Midpoint: "));
-            CSPanel.add(midpoint);
-            CSPanel.add(new JLabel("Contrast: "));
-            CSPanel.add(contrast);
+            CSPanel.add(new JLabel("Contrast Center(%): "));
+            CSPanel.add(cc);
+            CSPanel.add(new JLabel("Contrast Factor: "));
+            CSPanel.add(cf);
             JOptionPane.showConfirmDialog(null, CSPanel,
                     "Sigmoidal Contrasting", JOptionPane.OK_CANCEL_OPTION);
             // ImageMagick Call
@@ -810,9 +849,9 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
             // create the operation, add images and operators/options
             IMOperation op = new IMOperation();
             op.addImage(imagePath);
-            op.sigmoidalContrast(Double.parseDouble(contrast.getText()), Double.parseDouble(midpoint.getText()));
+            op.sigmoidalContrast(Double.parseDouble(cc.getText()), Double.parseDouble(cf.getText()));
             newImage = imagePath.replace(extension, "_"+opCount+extension);
-            historyList.add("sigmoidal contrast: contrast= " + contrast.getText() + " midpoint= " + midpoint.getText());
+            historyList.add("sigmoidal contrast: center= " + cc.getText() + " factor= " + cf.getText());
             op.addImage(newImage);
             // execute the operation
             try {
@@ -847,8 +886,8 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
                 String output_file_name = String.valueOf(new_path.getFileName());
 
                 env.put("VAR1", input_file_name);
-                env.put("VAR2", String.valueOf(contrast.getText()));
-                env.put("VAR3", String.valueOf(midpoint.getText()));
+                env.put("VAR2", String.valueOf(cc.getText()));
+                env.put("VAR3", String.valueOf(cf.getText()));
                 env.put("VAR4", output_file_name);
                 Process p = pb.start();
                 p.waitFor();
