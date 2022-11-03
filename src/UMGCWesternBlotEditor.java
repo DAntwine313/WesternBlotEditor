@@ -799,9 +799,9 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
             JTextField midpoint = new JTextField(5);
             JPanel CSPanel = new JPanel();
             CSPanel.setLayout(new GridLayout(2, 2));
-            CSPanel.add(new JLabel("Contrast Center(%): "));
+            CSPanel.add(new JLabel("Midpoint: "));
             CSPanel.add(midpoint);
-            CSPanel.add(new JLabel("Contrast Factor: "));
+            CSPanel.add(new JLabel("Contrast: "));
             CSPanel.add(contrast);
             JOptionPane.showConfirmDialog(null, CSPanel,
                     "Sigmoidal Contrasting", JOptionPane.OK_CANCEL_OPTION);
