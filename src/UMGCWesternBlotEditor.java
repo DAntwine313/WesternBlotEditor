@@ -834,14 +834,14 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
         }
         else if (e.getSource() == buttonSC | e.getSource() == toolsSC) {
             opCount++;
-            JTextField cc = new JTextField(5);
-            JTextField cf = new JTextField(5);
+            JTextField midpoint = new JTextField(5);
+            JTextField contrast = new JTextField(5);
             JPanel CSPanel = new JPanel();
             CSPanel.setLayout(new GridLayout(2, 2));
-            CSPanel.add(new JLabel("Contrast Center(%): "));
-            CSPanel.add(cc);
-            CSPanel.add(new JLabel("Contrast Factor: "));
-            CSPanel.add(cf);
+            CSPanel.add(new JLabel("Midpoint: "));
+            CSPanel.add(midpoint);
+            CSPanel.add(new JLabel("Contrast: "));
+            CSPanel.add(contrast);
             JOptionPane.showConfirmDialog(null, CSPanel,
                     "Sigmoidal Contrasting", JOptionPane.OK_CANCEL_OPTION);
             // ImageMagick Call
@@ -849,9 +849,9 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
             // create the operation, add images and operators/options
             IMOperation op = new IMOperation();
             op.addImage(imagePath);
-            op.sigmoidalContrast(Double.parseDouble(cc.getText()), Double.parseDouble(cf.getText()));
+            op.sigmoidalContrast(Double.parseDouble(contrast.getText()), Double.parseDouble(midpoint.getText()));
             newImage = imagePath.replace(extension, "_"+opCount+extension);
-            historyList.add("sigmoidal contrast: center= " + cc.getText() + " factor= " + cf.getText());
+            historyList.add("sigmoidal contrast: midpoint= " + midpoint.getText() + " contrast= " + midpoint.getText());
             op.addImage(newImage);
             // execute the operation
             try {
@@ -886,8 +886,8 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
                 String output_file_name = String.valueOf(new_path.getFileName());
 
                 env.put("VAR1", input_file_name);
-                env.put("VAR2", String.valueOf(cc.getText()));
-                env.put("VAR3", String.valueOf(cf.getText()));
+                env.put("VAR2", String.valueOf(midpoint.getText()));
+                env.put("VAR3", String.valueOf(contrast.getText()));
                 env.put("VAR4", output_file_name);
                 Process p = pb.start();
                 p.waitFor();
