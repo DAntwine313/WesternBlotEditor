@@ -459,6 +459,8 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
                 String imgDimensions = String.valueOf(width) + "x" + String.valueOf(height);
                 String threshold = String.valueOf(Radius.getText()) + "+" + String.valueOf(LowerLimit.getText()) + "%+" + String.valueOf(UpperLimit.getText())+"%";
                 String houghThreshold = String.valueOf("+"+HoughThreshold.getText());
+                Path new_path = Paths.get(this.imagePath);
+                String output_file_name = String.valueOf(new_path.getFileName());
                 String var1 = "\"$VAR1\"";
                 String var2 = "\"$VAR2\"";
                 String var3 = "\"$VAR3\"";
@@ -471,7 +473,7 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
                 Map<String, String> env = pb.environment();
 
                 env.put("VAR1", this.imageDirectory);
-                env.put("VAR2", this.imageName);
+                env.put("VAR2", output_file_name);
                 env.put("VAR3", threshold);
                 env.put("VAR4", imgDimensions);
                 env.put("VAR5", houghThreshold);
