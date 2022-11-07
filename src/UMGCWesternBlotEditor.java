@@ -232,15 +232,34 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
         l_c.add(imageScrollPane, BorderLayout.CENTER);
         pack();
         setVisible(true);
+        try {
+            FileReader istream;
+            istream = new FileReader("output.sh");
+            BufferedReader reader;
+            reader = new BufferedReader(istream);
+
+            FileWriter ostream;
+            ostream = new FileWriter("output.sh", true);
+            BufferedWriter writer;
+            writer = new BufferedWriter(ostream);
+            writer.write("cd " + this.imageDirectory);
+            reader.close();
+            writer.close();
+            System.out.println("Script Executed Successfully");
+        }catch (IOException ex){
+            throw new RuntimeException(ex);
+        }
     }
     public static void main(String[] args) throws IOException {
         UMGCWesternBlotEditor t = new UMGCWesternBlotEditor();
         t.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
+        new File("../output.sh").createNewFile();
 
     }
     // action listeners
     public void actionPerformed(ActionEvent e) {
+
+
         String newImage;
         if (e.getSource() == fileOpen) {
             opCount = 0;
