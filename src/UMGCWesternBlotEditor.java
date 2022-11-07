@@ -478,7 +478,9 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
                 String imgDimensions = String.valueOf(width) + "x" + String.valueOf(height);
                 String threshold = String.valueOf(Radius.getText()) + "+" + String.valueOf(LowerLimit.getText()) + "%+" + String.valueOf(UpperLimit.getText())+"%";
                 String houghThreshold = String.valueOf("+"+HoughThreshold.getText());
+                Path last_path = Paths.get(this.lastImage);
                 Path new_path = Paths.get(this.imagePath);
+                String input_file_name = String.valueOf(last_path.getFileName());
                 String output_file_name = String.valueOf(new_path.getFileName());
                 String var1 = "\"$VAR1\"";
                 String var2 = "\"$VAR2\"";
@@ -492,7 +494,7 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
                 Map<String, String> env = pb.environment();
 
                 env.put("VAR1", this.imageDirectory);
-                env.put("VAR2", output_file_name);
+                env.put("VAR2", input_file_name);
                 env.put("VAR3", threshold);
                 env.put("VAR4", imgDimensions);
                 env.put("VAR5", houghThreshold);
@@ -513,7 +515,7 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
                 while((currentLine = reader.readLine()) != null) {
 
                     currentLine = currentLine.replace(var1, this.imageDirectory);
-                    currentLine = currentLine.replace(var2, this.imageName);
+                    currentLine = currentLine.replace(var2, input_file_name);
                     currentLine = currentLine.replace(var3, threshold);
                     currentLine = currentLine.replace(var4, imgDimensions);
                     currentLine = currentLine.replace(var5, houghThreshold);
@@ -872,7 +874,7 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
             op.addImage(imagePath);
             op.sigmoidalContrast(Double.parseDouble(contrast.getText()), Double.parseDouble(midpoint.getText()));
             newImage = imagePath.replace(extension, "_"+opCount+extension);
-            historyList.add("sigmoidal contrast: midpoint= " + midpoint.getText() + " contrast= " + contrast.getText());
+            historyList.add("sigmoidal contrast: midpoint= " + midpoint.getText() + " contrast= " + midpoint.getText());
             op.addImage(newImage);
             // execute the operation
             try {
