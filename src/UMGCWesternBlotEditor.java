@@ -872,7 +872,7 @@ public class UMGCWesternBlotEditor extends JFrame implements ActionListener
             op.addImage(imagePath);
             op.sigmoidalContrast(Double.parseDouble(contrast.getText()), Double.parseDouble(midpoint.getText()));
             newImage = imagePath.replace(extension, "_"+opCount+extension);
-            historyList.add("sigmoidal contrast: midpoint= " + midpoint.getText() + " contrast= " + midpoint.getText());
+            historyList.add("sigmoidal contrast: midpoint= " + midpoint.getText() + " contrast= " + contrast.getText());
             op.addImage(newImage);
             // execute the operation
             try {
