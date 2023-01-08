@@ -1,4 +1,7 @@
 # UMGCWesternBlotEditor
+
+**MAINTAINED VERSION: https://github.com/jgoldmintz/WesternBE
+
 This program integrates Image Magick with an user interface, for the purposes of better imaging for Western Blot gels.
 
 For best results please create a folder for each image to work on as intermediates are created after each modification
